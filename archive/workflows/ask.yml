@@ -1,0 +1,84 @@
+# Use the working hive from anywhere, with no machine of yours switched on.
+#   Actions tab -> "Ask the hive" -> Run workflow -> type what you want done.
+# The hive plans the task, researches it on live sources, writes and runs code where that helps, checks its own
+# work with a jury, and writes the answer. The answer is on the run's page (Summary); every file it made (charts,
+# CSVs, programs, the full record of the run) is in the run's artifact "the-hive-answer".
+# This repository is public: the task you type and the answer are public too. Do not type anything private here;
+# for private work, install the hive on your own device (sh setup.sh).
+# The run has no token that can write anywhere, logs in nowhere and spends nothing. Risky actions are never approved.
+name: Ask the hive
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: What should the hive do?
+        required: true
+        type: string
+      rounds:
+        description: Follow-up rounds for anything left undone
+        default: "1"
+      roles:
+        description: "1: where the body's cells confirm no answer, the older hive of roles (not ternary) takes the task; empty: the body alone"
+        default: ""
+      members:
+        description: "Members first: each does the whole task, two must agree (team/solo.py), the roles take what they confirm nothing on. How many (0: the roles alone)"
+        default: "2"
+
+permissions:
+  contents: read
+
+jobs:
+  ask:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      TASK: ${{ inputs.task }}
+      ROUNDS: ${{ inputs.rounds || '1' }}
+      # Seed 9007 (never looked at, nothing learned, code db8b8d0): members first 10 of 16 in 179 minutes, the roles
+      # alone 9 of 16 in 178, the members alone 9 of 16 in 69. Level on one sitting, and never slower.
+      AGENT_TEAM_SOLO: ${{ inputs.members == '0' && '' || inputs.members || '2' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: The body (cells/body.json) - its trunk and the newest cell of each organ; with no cells yet, its DNA
+        env:
+          ROLES: ${{ inputs.roles || '' }}
+        run: |
+          DNA=$(python3 -c "import json; print(json.load(open('cells/body.json'))['dna'])")
+          WHO=$(python3 training/lineage.py members "$DNA" few)
+          if [ -n "$WHO" ]; then
+            python3 training/grow_record.py fetch "$WHO"
+            echo "HIVE_MEMBERS=$WHO" >> "$GITHUB_ENV"
+            if [ -z "$ROLES" ]; then echo "AGENT_TEAM_SOLO_ALONE=1" >> "$GITHUB_ENV"; echo "HIVE_LIGHT=1" >> "$GITHUB_ENV"; fi
+          fi
+      - uses: ./.github/actions/hive
+      - name: What the hive has solved so far (kept between runs in the Actions cache, never in git)
+        uses: actions/cache/restore@v4
+        with:
+          path: memory/solved.jsonl
+          key: hive-solved-${{ github.run_id }}
+          restore-keys: hive-solved-
+      - name: The hive works on it
+        run: python -m team "$TASK" --approve never --until-done "$ROUNDS" --run-dir run
+      - name: Keep what it solved
+        if: ${{ !cancelled() && hashFiles('memory/solved.jsonl') != '' }}
+        uses: actions/cache/save@v4
+        with:
+          path: memory/solved.jsonl
+          key: hive-solved-${{ github.run_id }}
+      - name: The answer
+        if: ${{ !cancelled() }}
+        run: |
+          if [ -f run/REPORT.md ]; then
+            cat run/REPORT.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "The hive did not finish a report. The log of the step above says why." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: the-hive-answer
+          path: |
+            run/
+            runs/
+          retention-days: 30
