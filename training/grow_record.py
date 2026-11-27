@@ -8,6 +8,10 @@
     python3 training/grow_record.py restart [RECORD]                exit 1 (saying why) after three generations dropped running
     python3 training/grow_record.py failed GEN RUN read|progress[,...]  docs/reads/latest.md says the read (or the graphs) failed
 
+HIVE_WRITE_NICHE=1 records matched individual gate grades in cells/niche.json. HIVE_STRATIFIED_POOL=1
+keeps a stratified active pool and saves recoverable JSONL gzip snapshots beside the output in pool-archive/.
+During a hosted record those snapshots also go to the hive-grown releases before the active rows are replaced.
+
 `gate` runs in the one job that may write to the repository, and runs no model and nothing the hive wrote. From the
 other jobs it takes only whole numbers within their bounds and names this file builds itself. Needs nothing but
 Python.
@@ -24,13 +28,18 @@ the release and the body stays as it was. Three generations dropped running stop
 What "after" passes over "dna" is what the hive taught itself; it is also counted apart on the kinds it never
 practised. Every generation leaves one line in training/reports/generations.jsonl, whatever the outcome.
 """
+import gzip
 import hashlib
+import itertools
 import json
 import os
 import re
+import subprocess
 import sys
+import tempfile
 import time
 import urllib.request
+from collections import defaultdict, deque
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -77,18 +86,182 @@ def _failure(ln):
         return None
 
 
-def union(groups, key=_row, most=MOST_ROWS):
+def _pool(rows, most):
+    """Return original lines in arrival order. Reserve oldest diverse anchors, checked corrections/hard rows, and the newest rows."""
+    if most < 0:
+        raise ValueError("negative row capacity")
+    if len(rows) <= most:
+        return rows
+    anchors, salient = most // 4, most * 35 // 100
+    recent = most - anchors - salient
+    first_recent = len(rows) - recent
+    chosen = set(range(first_recent, len(rows)))
+    by_kind, fixes, hard = defaultdict(deque), [], []
+    hard_kinds = {label for m in exam_kinds.HARD_KINDS for label in (m.KIND, *exam_kinds.written(m.KIND))}
+    recent_kinds = set()
+    for i, line in enumerate(rows):
+        row = json.loads(line)
+        kind = row.get("kind")
+        kind = kind if isinstance(kind, str) and kind else ""
+        if i >= first_recent:
+            recent_kinds.add(kind)
+            continue
+        by_kind[kind].append(i)
+        if (row.get("type") in ("fix", "pair") or row.get("dream") is True
+                or (row.get("failed_try_1") is True and row.get("solved_later") is True)):
+            fixes.append(i)
+        elif kind in hard_kinds or row.get("hard") is True:
+            hard.append(i)
+    # Oldest in each kind, one per round. Cover kinds absent from recency first.
+    queues = deque(by_kind[k] for k in sorted(by_kind, key=lambda k: (not k, k in recent_kinds, len(by_kind[k]), k)))
+    for _ in range(anchors):
+        q = queues.popleft()
+        chosen.add(q.popleft())
+        if q:
+            queues.append(q)
+    # If corrections or hard examples run out, unused seats go to the next newest rows.
+    for candidates in (reversed(fixes), reversed(hard), range(first_recent - 1, -1, -1)):
+        for i in candidates:
+            if len(chosen) == most:
+                break
+            chosen.add(i)
+    return [line for i, line in enumerate(rows) if i in chosen]
+
+
+def _rows_bytes(rows):
+    return "".join(line + "\n" for line in rows).encode()
+
+
+def _atomic(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as tmp:
+        try:
+            tmp.write(data)
+            tmp.close()
+            os.replace(tmp.name, path)
+        finally:
+            Path(tmp.name).unlink(missing_ok=True)
+
+
+def _archive(directory, rows, publish=False):
+    """Each immutable generation snapshot is ordinary gzipped JSONL. Its name hashes the exact uncompressed rows."""
+    directory.mkdir(parents=True, exist_ok=True)
+    digest = hashlib.sha256()
+    with tempfile.NamedTemporaryFile(dir=directory, delete=False) as tmp:
+        try:
+            with gzip.GzipFile(filename="", fileobj=tmp, mode="wb", compresslevel=1, mtime=0) as packed:
+                for line in rows:
+                    data = (line + "\n").encode()
+                    digest.update(data)
+                    packed.write(data)
+            tmp.close()
+            path = directory / ("pool-" + digest.hexdigest() + ".jsonl.gz")
+            os.replace(tmp.name, path)
+        finally:
+            Path(tmp.name).unlink(missing_ok=True)
+    if publish:
+        _publish_archive(path)
+    return path
+
+
+def _publish_archive(path):
+    """Use the cell release shards, but never clobber an already recoverable snapshot on a retry."""
+    repo = os.environ["GITHUB_REPOSITORY"]
+    held = {tag: release_store._names(repo, tag) for tag in release_store.tags()}
+    tag, = release_store.place([path], held)
+    if held[tag] is None:
+        created = release_store._gh("release", "create", tag, "-R", repo, "--title", f"What the hive grew ({tag})",
+                                    "--notes", "Additional hive release storage.", check=False)
+        if created.returncode and release_store._names(repo, tag) is None:
+            created.check_returncode()
+    if path.name not in (held[tag] or ()):
+        uploaded = release_store._gh("release", "upload", tag, "-R", repo, str(path), check=False)
+        if uploaded.returncode == 0:
+            return
+        if path.name not in (release_store._names(repo, tag) or ()):
+            uploaded.check_returncode()
+    # An existing asset, including one from a simultaneous record, must contain the same original lines.
+    with tempfile.TemporaryDirectory() as tmp:
+        copy = Path(tmp) / path.name
+        release_store._gh("release", "download", tag, "-R", repo, "--pattern", path.name, "--output", str(copy))
+        with gzip.open(copy, "rb") as restored:
+            digest = hashlib.file_digest(restored, "sha256").hexdigest()
+        if path.name != f"pool-{digest}.jsonl.gz":
+            raise ValueError(f"release archive failed its checksum: {path.name}")
+
+
+def _workflow_job(name):
+    return os.environ.get("GITHUB_ACTIONS") == "true" and os.environ.get("GITHUB_JOB") == name
+
+
+def _pool_handoff(active, complete=None):
+    """The read-only gather runner uploads lessons/lessons.json alongside the capped training pool."""
+    path = Path("lessons/lessons.json")
+    limit = 64 * 1024 ** 2
+    if path.stat().st_size > limit:
+        raise ValueError("pool handoff exceeds 64 MiB")
+    note = json.loads(path.read_text().strip() or "{}")
+    active_hash = hashlib.sha256(_rows_bytes(active)).hexdigest()
+    if complete is not None:
+        selected = set(active)
+        note["pool_v1"] = {"run": os.environ["GITHUB_RUN_ID"], "active": active_hash,
+                           "source": hashlib.sha256(_rows_bytes(complete)).hexdigest(),
+                           "spill": [[i, line] for i, line in enumerate(complete) if line not in selected]}
+        data = (json.dumps(note) + "\n").encode()
+        if len(data) > limit:
+            raise ValueError("pool handoff exceeds 64 MiB; active pool has not been replaced")
+        _atomic(path, data)
+        return
+    receipt = note["pool_v1"]
+    if receipt["run"] != os.environ["GITHUB_RUN_ID"] or receipt["active"] != active_hash:
+        raise ValueError("pool handoff does not match the gather run or active rows")
+    spill = receipt["spill"]
+    if not isinstance(spill, list):
+        raise ValueError("invalid overflow list")
+    rows = [None] * (len(active) + len(spill))
+    for i, line in spill:
+        if type(i) is not int or not 0 <= i < len(rows) or rows[i] is not None or not isinstance(line, str) or "\n" in line:
+            raise ValueError("invalid overflow row or position")
+        rows[i] = line
+    live = iter(active)
+    rows = [next(live) if row is None else row for row in rows]
+    if receipt["source"] != hashlib.sha256(_rows_bytes(rows)).hexdigest():
+        raise ValueError("pool handoff does not reconstruct the gather input")
+    return rows
+
+
+def union(groups, key=_row, most=MOST_ROWS, *, snapshot=None):
     """Every line of every group once, in order (a line that is no row is dropped), the newest `most` of them.
     On 2026-11-14 a trial that had read the release hours before wrote its older, smaller copy back over it, and
     the 170 rows generation 11 had practised were gone from the release: so nothing is uploaded now that was not
     first joined with what the release holds at that moment."""
+    stratified = key is _row and os.environ.get("HIVE_STRATIFIED_POOL") == "1"
     seen, out = set(), []
+    groups_read = 0
     for group in groups:
+        groups_read += 1
         for ln in group:
-            k = key(ln)
+            try:
+                k = key(ln)
+            except AttributeError:
+                if stratified:  # a JSON scalar has no row fields
+                    continue
+                raise
             if k and k not in seen:
                 seen.add(k)
                 out.append(ln)
+    if stratified:
+        kept = _pool(out, most)
+        if snapshot is not None:
+            snapshot.extend(out)
+        elif _workflow_job("gather"):
+            # grow.gather first joins [old, new], then queries [old] only to count it.
+            if groups_read > 1:
+                _pool_handoff(kept, out)
+        elif len(kept) < len(out):
+            state = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
+            _archive(state / "hive" / "pool", out)
+        return kept
     return out[-most:]
 
 
@@ -313,8 +486,8 @@ def paired(folder, names=("before", "after")):
     return {a: arm([by[a][s] for s in both]) for a in names}, both
 
 
-def delivery_changes(folder, pair=("before", "after")):
-    """Compare final grades for the same task on two bodies. Only IDs and registered kind labels leave this process."""
+def _exam_cases(folder, pair):
+    """Verified task identities and the corresponding delivered and individual checker verdicts."""
     known = {"c": {"several tasks in one"}}
     for group, modules in (("e", exam_kinds.EASY_KINDS), ("h", exam_kinds.HARD_KINDS)):
         known[group] = {label for m in modules for label in exam_kinds.written(m.KIND)}
@@ -343,8 +516,13 @@ def delivery_changes(folder, pair=("before", "after")):
                             or not isinstance(prompt, str) or not prompt.strip() or type(ok) is not bool
                             or not isinstance(kind, str) or kind not in known[tid[0]]):
                         continue
-                    ids[tid] = ((shard.name.rsplit("-", 1)[1], code, kind, prompt), ok)
+                    ids[tid] = ((shard.name.rsplit("-", 1)[1], code, kind, prompt), ok, row.get("members"))
+    return sat, cases
 
+
+def delivery_changes(folder, pair=("before", "after")):
+    """Compare final grades for the same task on two bodies. Only IDs and registered kind labels leave this process."""
+    sat, cases = _exam_cases(folder, pair)
     counts = dict.fromkeys(("gained", "lost", "both_pass", "both_fail"), 0)
     changed = {"gained": [], "lost": []}
     for tid in sorted(cases[pair[0]].keys() & cases[pair[1]].keys()):
@@ -358,6 +536,80 @@ def delivery_changes(folder, pair=("before", "after")):
             changed[outcome].append({"id": tid, "kind": before[0][2]})
         counts[outcome] += 1
     return {"sat": sat, "comparable": sum(counts.values()), "counts": counts, "changed": changed}
+
+
+def niche_scores(folder, dna, rosters):
+    """Pass rates per kind on a common panel. Unseated cells have no grade; lineage treats missing columns as zero."""
+    _, cases = _exam_cases(folder, rosters)
+    panels = defaultdict(list)
+    minimum = 1 if len(set().union(*rosters.values())) == 1 else 2
+    for tid in sorted(set().union(*(set(rows) for rows in cases.values()))):
+        observations = [(arm, rows[tid]) for arm, rows in cases.items() if tid in rows]
+        if any(case is None for _, case in observations) or len({case[0] for _, case in observations}) != 1:
+            continue
+        identity = observations[0][1][0]
+        grades = defaultdict(list)
+        for arm, (_, _, members) in observations:
+            if not isinstance(members, list) or len(members) > 5:
+                continue
+            seats = set()
+            verified = []
+            for position, member in enumerate(members, 1):
+                if not isinstance(member, dict):
+                    continue
+                # Earlier checked exam summaries recorded the cell and grade before adding the seat number.
+                seat, who, ok = member.get("member", position), member.get("who"), member.get("ok")
+                if type(seat) is not int or seat in seats or not 1 <= seat <= 5:
+                    break  # ambiguous receipt: no verdicts from this arm on this task
+                seats.add(seat)
+                if type(ok) is bool and isinstance(who, str) and who.startswith(dna + "+"):
+                    cell = who[len(dna) + 1:]
+                    if cell in rosters[arm]:
+                        verified.append((cell, ok))
+            else:
+                for cell, ok in verified:
+                    grades[cell].append(ok)
+        # At most five seats per arm. Extra seats must not hide a task shared by a smaller cohort.
+        for size in range(minimum, len(grades) + 1):
+            for cells in itertools.combinations(sorted(grades), size):
+                panels[cells].append((identity[2], grades))
+    if not panels:
+        return {}
+    # Same cells graded on every included task. Choose the most observations without looking at their results.
+    cohort = min(panels, key=lambda cells: (-len(cells) * len(panels[cells]), -len(cells), cells))
+    by_cell = {}
+    for cell in cohort:
+        by_kind = defaultdict(list)
+        for kind, grades in panels[cohort]:
+            trials = grades[cell]
+            by_kind[kind].append(sum(trials) / len(trials))  # equal task weight even if the cell sat both arms
+        by_cell[cell] = {kind: sum(values) / len(values) for kind, values in sorted(by_kind.items())}
+    return by_cell
+
+
+def _write_niche(dna, scores):
+    path = BODY.with_name("niche.json")
+    existing = json.loads(path.read_text()) if path.exists() else {}
+    existing[dna] = scores  # a new snapshot, so a retry cannot count the same gate twice
+    _atomic(path, (json.dumps(existing, sort_keys=True) + "\n").encode())
+    if _workflow_job("record"):
+        # The record commits a fixed list of paths. Explicitly stage this one opt-in file for the next generation.
+        subprocess.run(["git", "add", "--", "cells/niche.json"], cwd=ROOT, check=True)
+
+
+def _newer_record(gen, dna):
+    # A dropped generation can have newer measurements than body.generation (the last *kept* body).
+    for line in lines(RECORD):
+        try:
+            other = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(other, dict) or other.get("trial") or other.get("dna") != dna:
+            continue
+        name = other.get("generation")
+        if isinstance(name, str) and re.fullmatch(r"g\d{1,6}", name) and int(name[1:]) > int(gen[1:]):
+            return True
+    return False
 
 
 def decide(arms, grow=False, held=None, before_sat=False):
@@ -472,9 +724,20 @@ def gate(argv):
         keep, why = False, "a trial beside the line of generations (the body is not changed by it); by the numbers it would be kept: " + why
     after, retired = cells, []
     old_parents = {c: p for c, p in (body.get("parents") or {}).items() if isinstance(p, str)} if same_dna else {}
+    write_niche = os.environ.get("HIVE_WRITE_NICHE") == "1"
+    if (write_niche and not trial
+            and (not same_dna or body.get("generation", 0) <= int(gen[1:])) and (same_dna or keep)
+            and not _newer_record(gen, dna)):
+        rosters = {"before": set(before)} if before and (grow or not keep) else {}
+        if keep:
+            rosters["after"] = set(before + cells if grow else cells)
+        scores = niche_scores(folder, dna, rosters) if rosters else {}
+        if scores:  # a lost examination supplies no evidence to replace the last measured panel
+            _write_niche(dna, scores)
     if keep and grow:
         # the body multiplies: the cells before stay and their children join them (training/lineage.py)
-        after, retired = lineage.grown_body(before, cells, dict(old_parents, **parent_of))
+        # On a DNA switch the existing body file still names the previous DNA until this record finishes.
+        after, retired = lineage.grown_body(before, cells, dict(old_parents, **parent_of), dna=dna if write_niche else None)
     elif not keep:
         after = before
     # how hard the lessons are from here on, by what this generation's practice passed (a trial moves nothing)
@@ -645,8 +908,23 @@ def fetch(argv):
 
 def join(argv, key, most):
     """OUT FILE ...: every line of the files once, in order, written to OUT (which may be one of the files)."""
-    kept = union([lines(f) for f in argv[1:]], key, most)
-    Path(argv[0]).write_text("".join(ln + "\n" for ln in kept))
+    dest = Path(argv[0])
+    if key is _row and os.environ.get("HIVE_STRATIFIED_POOL") == "1":
+        groups = [lines(f) for f in argv[1:]]
+        publish = _workflow_job("record")
+        if publish:
+            groups[-1] = _pool_handoff(groups[-1])
+        snapshot = []
+        kept = union(groups, key, most, snapshot=snapshot)
+        del groups  # joining two successive release files can hold nearly every original string twice
+        # Archive both survivors and spill before replacing any input. Parallel records can be recovered
+        # from their independently named snapshots even when one overwrites the release's active rows.
+        path = _archive(dest.parent / "pool-archive", snapshot, publish)
+        print(f"pool archive: {path.name} ({len(snapshot)} unique rows, {len(kept)} active)")
+        _atomic(dest, _rows_bytes(kept))
+    else:
+        kept = union([lines(f) for f in argv[1:]], key, most)
+        dest.write_text("".join(ln + "\n" for ln in kept))
     print(f"{argv[0]}: {len(kept)} lines from {', '.join(f'{f} ({len(lines(f))})' for f in argv[1:])}")
     return 0
 
