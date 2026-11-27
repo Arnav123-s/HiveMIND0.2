@@ -24,6 +24,7 @@ The kinds held out of practice (exam_hard.HELD_OUT) are never taught: they measu
 over to work never shown.
 """
 import json
+import os
 import re
 import sys
 import tempfile
@@ -403,6 +404,25 @@ def teach(seed, per_kind=1, failures=None, most_failures=12, out=None, log=print
     made, right, dropped, left = [], 0, [], set()
     agreed = agreed_wrong_kinds(failures)
     by_kind, failed = {}, {}
+    planned = len(plan)
+    if os.environ.get("HIVE_AST_TRIAD") == "1" and per_kind > 0:
+        from training import ast_triad
+        # One draw per structural level, independent of the practice/exam task registry.
+        count = 3 * per_kind
+        planned += count * len(ast_triad.KINDS)
+        try:
+            items = ast_triad.verified(seed, count)
+        except (OSError, ValueError, RuntimeError) as exc:
+            dropped.append(f"AST verification: {exc}")
+            log(dropped[-1], flush=True)
+            for kind in ast_triad.KINDS:
+                by_kind[kind] = [0, count]
+                failed[kind] = {"verification failed": count}
+        else:
+            made.extend(row for item in items for row in ast_triad.rows(item))
+            for kind in ast_triad.KINDS:
+                by_kind[kind] = [count, count]
+                right += count
     for maker, rseed, level, parts, wrong in plan:
         if minutes and time.time() - t0 > minutes * 60:
             dropped.append("out of time")
@@ -436,7 +456,7 @@ def teach(seed, per_kind=1, failures=None, most_failures=12, out=None, log=print
     if left:
         log(f"left to the hive (it has {OWN} or more right programs of its own): {', '.join(sorted(left))}", flush=True)
     log(by_kind_line(by_kind, failed), flush=True)
-    return {"lessons": len(plan), "made": sum(n for _, n in by_kind.values()), "right": right, "rows": len(made), "dropped": dropped,
+    return {"lessons": planned, "made": sum(n for _, n in by_kind.values()), "right": right, "rows": len(made), "dropped": dropped,
             "left_to_the_hive": sorted(left), "seconds": round(time.time() - t0), "by_kind": by_kind, "failed_by_kind": failed}
 
 
