@@ -1,3 +1,15 @@
+# HiveMIND0.2
+HiveMIND research — new home for the hive work (code, experiment records, notes).
+
+> **Read first:** [`docs/REPO-POLICY.md`](docs/REPO-POLICY.md) (no Actions compute; training runs local, Kaggle or
+> Hugging Face only), [`RECOVERY.md`](RECOVERY.md) and [`BACKUP-INVENTORY.md`](BACKUP-INVENTORY.md). This branch
+> is the lean, code-only recovery of the original project main `47aa83b`. Full history and weights live in the
+> owner's private Drive archive, not on GitHub. Wherever the project README below mentions `.github/workflows/`,
+> the Actions tab or free Actions runners, it describes the old repository. Those workflows are archived and inert
+> under `archive/workflows/`.
+
+---
+
 # HiveMIND
 
 A hive of small ternary models (every weight is -1, 0 or +1) that does what it is asked (questions, talk, tasks)
