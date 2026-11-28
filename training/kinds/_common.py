@@ -50,6 +50,50 @@ def _says(body, x, tol=0.006):
     return any(abs(g - x) <= tol for g in _nums(body))
 
 
+# ---- the open-web answer check (resume 2026-11-28) --------------------------------------------------------------------
+# Defect (Codex audit of the preserved data): in g34, task h10003306_01 (the Platte River, Wikidata Q655754), two
+# members answered with a dump of Wikidata's page and were marked right, because the check took ANY number of the text
+# within tolerance as the answer. Seven rows of datasets/g80/rows.jsonl teach that program. A page dump holds hundreds
+# of numbers, so one of them is near almost any value. An answer must now LOOK like an answer: no dump of a page or of
+# JSON, and few enough numbers that the right one was said, not found by luck.
+DUMP = re.compile(r'<html|<!doctype|<div|<body|</a>|"entities"\s*:|"claims"\s*:|"mainsnak"|"datavalue"', re.I)  # a short JSON answer is fine
+MOST_NUMBERS = 8  # an honest answer of these kinds states 1 to 3 values, each with a date or a unit: under 8 numbers
+
+
+def _dumped(body, most=MOST_NUMBERS):
+    """Why BODY cannot be taken as an answer ('' when it can): a page or JSON dump, or too many numbers to say which."""
+    if DUMP.search(body or ""):
+        return "the answer is a dump of a page or of JSON, not an answer"
+    n = len(_nums(body or ""))
+    if n > most:
+        return f"the answer holds {n} numbers (at most {most}): the right one would be found by luck"
+    return ""
+
+
+def _v2(loose_ok, text, most=MOST_NUMBERS, kind=""):
+    """(ok, tag) of a web check under eval_v2: the eval_v1 verdict (LOOSE_OK, the check as it was) AND an answer-shaped
+    TEXT. The tag records both verdicts in the check's reason, so one sitting yields both scores for the same answers
+    (scripts/rebaseline.py reads it): ' [eval_v1: pass; eval_v2: fail; kind: m_born]'."""
+    why = _dumped(text, most)
+    ok = bool(loose_ok) and not why
+    return ok, (f" ({why})" if why else "") + f" [eval_v1: {'pass' if loose_ok else 'fail'}; eval_v2: {'pass' if ok else 'fail'}; kind: {kind}]"
+
+
+def _states(body, values, tol, most=MOST_NUMBERS, kind=""):
+    """(ok, why): BODY states every value in VALUES (each a number, or a list of numbers any one of which is right),
+    each within TOL (a number, or a function of the value), and is answer-shaped (_dumped). WHY ends in the _v2 tag."""
+    got = _nums(body or "")
+    tolf = tol if callable(tol) else (lambda v: tol)
+    loose, miss = True, ""
+    for want in values:
+        opts = want if isinstance(want, (list, tuple)) else [want]
+        if not any(abs(g - v) <= tolf(v) for g in got for v in opts):
+            loose, miss = False, f"no number of the answer is {', '.join(f'{v:g}' for v in opts[:6])}"
+            break
+    ok, tag = _v2(loose, body, most, kind)
+    return ok, (miss + tag).strip()
+
+
 def _file(run, name):
     """The file the task asked for, by its exact name, wherever under the run's work folder it was saved."""
     got = [p for p in (run / "work").rglob(name) if p.is_file()] if (run / "work").exists() else []

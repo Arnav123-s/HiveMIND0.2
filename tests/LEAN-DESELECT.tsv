@@ -1,0 +1,90 @@
+# Lean test procedure: tests the lean suite leaves out, ONE line each, with the reason. scripts/lean_tests.py reads it.
+# WORKFLOW: asserts on .github/workflows or .github/actions, archived on purpose (docs/REPO-POLICY.md). Retire or rewrite; never restore the workflows.
+# DRIVE_DATA: needs a file that lives in the Drive archive by design (BACKUP-INVENTORY.md), not in the repo.
+# PREEXISTING: fails on the recovered snapshot 58f927f as it is; a real open defect, to fix, not to hide.
+# A whole file is written as its path alone (it fails at collection). Anything that fails and is NOT here is a regression.
+id	category	reason
+tests/test_gate_split.py	WORKFLOW	.github/workflows/grow.yml (collection)
+tests/test_hours.py	WORKFLOW	.github/workflows/grow.yml (collection)
+tests/test_slice_deadline.py	WORKFLOW	.github/workflows/grow.yml (collection)
+tests/test_talk_saved.py	DRIVE_DATA	training/reports/retained-skills/work-order-cases.json (collection)
+tests/test_capped_run.py::test_the_train_step_runs_through_the_cap_inside_the_outer_timeout	WORKFLOW	.github/workflows/grow.yml
+tests/test_cells.py::test_splits_disjoint_and_labelled	PREEXISTING	IndexError: empty sequence; fails the same on the untouched snapshot 58f927f
+tests/test_colab.py::test_the_notebook_is_offered_only_the_children_it_can_finish_a_different_one_each_generation	WORKFLOW	.github/workflows/grow.yml
+tests/test_colab.py::test_the_step_slice_0_orders_from_a_notebook_that_is_there_and_marks_the_cell	WORKFLOW	.github/workflows/grow.yml
+tests/test_colab.py::test_the_step_other_slices_stand_aside_once_the_order_exists	WORKFLOW	.github/workflows/grow.yml
+tests/test_colab.py::test_explicit_cpu_trials_use_the_requested_clock_even_with_a_live_notebook[85-hash-off]	WORKFLOW	.github/workflows/grow.yml
+tests/test_colab.py::test_explicit_cpu_trials_use_the_requested_clock_even_with_a_live_notebook[110-hash-off]	WORKFLOW	.github/workflows/grow.yml
+tests/test_colab.py::test_explicit_cpu_trials_use_the_requested_clock_even_with_a_live_notebook[170-hash-off]	WORKFLOW	.github/workflows/grow.yml
+tests/test_colab.py::test_explicit_cpu_trials_use_the_requested_clock_even_with_a_live_notebook[auto-cost-off]	WORKFLOW	.github/workflows/grow.yml
+tests/test_colab.py::test_explicit_cpu_trials_use_the_requested_clock_even_with_a_live_notebook[auto-hash-observe]	WORKFLOW	.github/workflows/grow.yml
+tests/test_colab.py::test_explicit_cpu_trials_use_the_requested_clock_even_with_a_live_notebook[auto-hash-stop]	WORKFLOW	.github/workflows/grow.yml
+tests/test_colab.py::test_the_step_waits_the_window_then_trains_as_always_with_no_order_and_no_notebook	WORKFLOW	.github/workflows/grow.yml
+tests/test_colab.py::test_the_step_no_one_waits_for_a_notebook_not_seen_for_12_hours_nor_for_a_child_not_offered	WORKFLOW	.github/workflows/grow.yml
+tests/test_cpu_fieldwork.py::test_climate_forecasts_only_future_and_thermal_uses_fresh_reset	DRIVE_DATA	training/experiments/fieldwork/mauna_loa.csv
+tests/test_cycle.py::test_runs_on_the_real_repo	DRIVE_DATA	training/reports/generations.jsonl (no generation records in the lean repo)
+tests/test_exposure.py::test_tidal_observations_via_cli	DRIVE_DATA	training/reports/checked-repair/san-francisco-tide.csv
+tests/test_exposure.py::test_numeric_units_custom_columns_and_discontinuities	DRIVE_DATA	training/reports/checked-repair/rule.json
+tests/test_exposure.py::test_timezone_offsets_compare_as_instants	DRIVE_DATA	training/reports/checked-repair/rule.json
+tests/test_exposure.py::test_no_intervals_are_measurable	DRIVE_DATA	training/reports/checked-repair/rule.json
+tests/test_exposure.py::test_decimal_intervals_at_gap_limit_and_large_finite_readings	DRIVE_DATA	training/reports/checked-repair/rule.json
+tests/test_fresh_run.py::test_a_run_whose_body_is_still_the_branchs_goes_on	WORKFLOW	.github/workflows/grow.yml
+tests/test_fresh_run.py::test_a_run_queued_behind_a_generation_that_recorded_ends	WORKFLOW	.github/workflows/grow.yml
+tests/test_fresh_run.py::test_the_schedule_starts_nothing_while_the_line_runs	WORKFLOW	.github/workflows/grow.yml
+tests/test_fresh_run.py::test_a_scheduled_run_ends_when_the_line_ran_2_hours_ago	WORKFLOW	.github/workflows/grow.yml
+tests/test_fresh_run.py::test_the_schedule_restarts_a_line_that_stopped	WORKFLOW	.github/workflows/grow.yml
+tests/test_fresh_run.py::test_a_dispatched_run_ends_when_a_newer_line_run_is_queued	WORKFLOW	.github/workflows/grow.yml
+tests/test_fresh_run.py::test_a_dispatched_run_alone_goes_on	WORKFLOW	.github/workflows/grow.yml
+tests/test_fresh_run.py::test_a_trial_is_not_ended_by_a_newer_line_run	WORKFLOW	.github/workflows/grow.yml
+tests/test_fresh_run.py::test_every_later_job_waits_for_the_answer	WORKFLOW	.github/workflows/grow.yml
+tests/test_held_exam.py::test_before_and_after_sit_it_in_the_gate_and_it_never_fails_a_seat	WORKFLOW	.github/workflows/grow.yml
+tests/test_held_exam.py::test_the_seat_step_runs_as_github_runs_it	WORKFLOW	.github/workflows/grow.yml
+tests/test_held_exam.py::test_every_held_out_kind_is_counted_the_program_kinds_too	DRIVE_DATA	training/reports/generations.jsonl
+tests/test_hive_cpu_learning.py::test_cell_messages_bind_the_code_to_task_sender_role_and_version	DRIVE_DATA	training/reports/rule_lab/engrams/four-bit-pair.npz
+tests/test_knowledge.py::test_the_knowledge_holds_together_and_the_page_is_drawn_from_it	WORKFLOW	AssertionError: assert ['workflow: n...e/action.yml'] == []
+tests/test_lessons.py::test_t4_the_log_lesson_reads_the_file_and_its_rows_fit_a_32_bit_runner	PREEXISTING	lesson rows over lessons.LIMIT 508 pieces (e.g. h_walk 534); counted by the fallback rule when the DNA tokenizer is not cached; fails the same on 58f927f
+tests/test_lessons.py::test_t4_module_and_search_lessons_fit_508_pieces_and_are_drawn_again_when_their_values_do_not	PREEXISTING	lesson rows over lessons.LIMIT 508 pieces (e.g. h_walk 534); counted by the fallback rule when the DNA tokenizer is not cached; fails the same on 58f927f
+tests/test_lessons.py::test_t4_the_website_and_fact_lessons_fit_without_a_site	PREEXISTING	lesson rows over lessons.LIMIT 508 pieces (e.g. h_walk 534); counted by the fallback rule when the DNA tokenizer is not cached; fails the same on 58f927f
+tests/test_map.py::test_every_job_of_the_workflow_is_on_the_map	WORKFLOW	.github/workflows/grow.yml
+tests/test_map.py::test_every_needs_edge_is_drawn	WORKFLOW	.github/workflows/grow.yml
+tests/test_map.py::test_every_path_the_map_names_exists	WORKFLOW	AssertionError: paths named on docs/MAP.md that do not exist: ['.github/actions/hive/action.yml', '.
+tests/test_measure.py::test_the_parts_graph_is_drawn_and_the_line_sits_four_seeds_with_three_lessons_a_kind	WORKFLOW	.github/workflows/grow.yml
+tests/test_paired_gate.py::test_the_gate_sits_before_and_after_on_the_same_eight_seeds_for_a_growing_body	WORKFLOW	.github/workflows/grow.yml
+tests/test_paired_gate.py::test_the_record_does_not_restart_after_three_drops	WORKFLOW	.github/workflows/grow.yml
+tests/test_practice_arms.py::test_the_shell_of_the_practice_job_gives_each_runner_its_arm	WORKFLOW	.github/workflows/grow.yml
+tests/test_reads.py::test_the_record_job_writes_the_read_and_redraws_and_commits_it	WORKFLOW	.github/workflows/grow.yml
+tests/test_record_artifacts.py::test_the_record_reads_what_it_needs_by_paging_not_by_pattern	WORKFLOW	.github/workflows/grow.yml
+tests/test_record_said.py::test_the_record_job_adds_the_entry_and_draws_the_page	WORKFLOW	.github/workflows/grow.yml
+tests/test_record_said.py::test_the_schedule_is_not_on_grow_yml_where_it_takes_a_generation_number	WORKFLOW	.github/workflows/grow.yml
+tests/test_record_said.py::test_the_nightly_starts_nothing_while_a_run_is_in_progress_or_queued	WORKFLOW	.github/workflows/nightly.yml
+tests/test_record_said.py::test_the_nightly_starts_nothing_when_the_line_ran_within_8_hours	WORKFLOW	.github/workflows/nightly.yml
+tests/test_record_said.py::test_the_nightly_restarts_a_line_that_stopped	WORKFLOW	.github/workflows/nightly.yml
+tests/test_record_said.py::test_the_nightly_stops_with_the_line	WORKFLOW	.github/workflows/nightly.yml
+tests/test_release_store.py::test_the_workflow_reads_and_writes_cells_through_the_store	WORKFLOW	.github/workflows/grow.yml
+tests/test_rule_lab.py::test_population_history_survives_loss_of_all_correct_answers	DRIVE_DATA	training/reports/rule_lab/traces.jsonl.gz
+tests/test_rules.py::test_the_researcher_judges_which_facts_answer_a_sub_question	DRIVE_DATA	training/evals/answers_q_real.jsonl
+tests/test_self_learning.py::test_every_child_reads_raw_data_and_answers_people_judged_and_dreams_try_twice	WORKFLOW	.github/workflows/grow.yml
+tests/test_slices.py::test_the_workflow_grows_each_child_on_its_slices_and_joins_them_before_the_trunk	WORKFLOW	.github/workflows/grow.yml
+tests/test_spawn.py::test_the_workflow_that_grows_the_hive_is_a_valid_file	WORKFLOW	.github/workflows/hive.yml
+tests/test_speed_flags.py::test_the_workflow_and_the_record_accept_the_speed_flags[--packed-dna]	WORKFLOW	.github/workflows/grow.yml
+tests/test_speed_flags.py::test_the_workflow_and_the_record_accept_the_speed_flags[--train-batch 4]	WORKFLOW	.github/workflows/grow.yml
+tests/test_speed_flags.py::test_the_workflow_and_the_record_accept_the_speed_flags[--vocab-ce]	WORKFLOW	.github/workflows/grow.yml
+tests/test_speed_flags.py::test_the_workflow_and_the_record_accept_the_speed_flags[--packed-dna --vocab-ce]	WORKFLOW	.github/workflows/grow.yml
+tests/test_speed_flags.py::test_the_workflow_and_the_record_accept_the_speed_flags[--orpo --train-batch 2]	WORKFLOW	.github/workflows/grow.yml
+tests/test_study.py::test_the_flow_runs_a_generation_on_more_runners_with_the_same_work	WORKFLOW	.github/workflows/grow.yml
+tests/test_talk_exam.py::test_the_gate_sits_the_talk_exam_on_one_after_seat_and_the_record_keeps_it	WORKFLOW	.github/workflows/grow.yml
+tests/test_talk_smoke.py::test_the_gate_sends_them_on_the_second_seat_and_never_fails_it	WORKFLOW	.github/workflows/grow.yml
+tests/test_talk_smoke.py::test_the_record_commits_the_page_with_the_drawn_files	WORKFLOW	.github/workflows/grow.yml
+tests/test_talk_smoke.py::test_a_failed_page_never_fails_the_record	WORKFLOW	.github/workflows/grow.yml
+tests/test_ternary_restart.py::test_the_runtime_kept_between_runs_is_keyed_by_the_cpus_instructions_not_its_name	WORKFLOW	.github/actions/hive/action.yml
+tests/test_versus_pull.py::test_versus_flag_lists_accept_pull_and_reject_unknown_flags	WORKFLOW	.github/workflows/grow.yml
+tests/test_versus_pull.py::test_a_versus_trial_may_pass_orpo_and_the_line_stays_on_dpo	WORKFLOW	.github/workflows/grow.yml
+tests/test_workflow_shell.py::test_slices_are_joined_under_bash_e	WORKFLOW	.github/workflows/grow.yml
+tests/test_workflow_shell.py::test_a_whole_cell_is_taken_as_it_is	WORKFLOW	.github/workflows/grow.yml
+tests/test_workflow_shell.py::test_an_earlier_runs_cell_from_before_slices_is_taken_whole	WORKFLOW	.github/workflows/grow.yml
+tests/test_workflow_shell.py::test_nothing_grown_says_so_and_fails	WORKFLOW	.github/workflows/grow.yml
+tests/test_workflow_shell.py::test_a_failed_read_is_said_on_the_page_and_the_job_ends_red[read-the read failed in run 4242]	WORKFLOW	.github/workflows/grow.yml
+tests/test_workflow_shell.py::test_a_failed_read_is_said_on_the_page_and_the_job_ends_red[progress-the progress failed in run 4242]	WORKFLOW	.github/workflows/grow.yml
+tests/test_workflow_shell.py::test_a_failed_read_is_said_on_the_page_and_the_job_ends_red[read,failed-The read failed in run 4242; see the record job's log.]	WORKFLOW	.github/workflows/grow.yml
+tests/test_workflow_shell.py::test_when_all_is_drawn_the_last_step_is_green	WORKFLOW	.github/workflows/grow.yml
+tests/test_workflow_shell.py::test_a_record_lands_when_main_redrew_progress_after_checkout	WORKFLOW	.github/workflows/grow.yml

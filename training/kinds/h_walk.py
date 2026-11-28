@@ -6,7 +6,7 @@ its lesson writes the right program for a task of it (training/lessons.py teache
 import re
 
 from training import hive_bench as B
-from training.kinds._common import CATEGORY, _fill, _says
+from training.kinds._common import CATEGORY, _fill, _states
 
 KIND = "h_walk"
 FAMILY = "hard: websites"
@@ -42,8 +42,8 @@ def h_walk(r):
         books = _all_books(cat)
         price = (max if top else min)(p for _, p in books)
         body = B._body(report)
-        ok = _says(body, len(books), 0.1) and _says(body, price)
-        return ok, f"{cat}: {len(books)} books, the {'highest' if top else 'lowest'} price {price}; both in the answer: {ok}"
+        ok, why = _states(body, [len(books), price], lambda v: 0.1 if v == len(books) else 0.006, most=8, kind="h_walk")  # no page dump of the prices
+        return ok, f"{cat}: {len(books)} books, the {'highest' if top else 'lowest'} price {price}; both in the answer: {ok}" + (f"; {why}" if why else "")
     return ("hard: websites", "walk a site over several pages", f"On books.toscrape.com the category '{cat}' runs over several pages. How many "
             f"books does it list in total, over all its pages, and what is the price of the {'most expensive' if top else 'cheapest'} one?", check)
 

@@ -6,7 +6,7 @@ its lesson writes the right program for a task of it (training/lessons.py teache
 import re
 
 from training import hive_bench as B
-from training.kinds._common import CATEGORY, _fill
+from training.kinds._common import CATEGORY, DUMP, _fill
 
 KIND = "m_csv"
 FAMILY = "websites"
@@ -29,7 +29,11 @@ def m_csv(r):
         prices = [p.text.strip().lstrip("£Â") for p in B._category(cat).select("article.product_pod .price_color")]
         text = cs[0].read_text(errors="ignore")
         got = [p for p in prices if p in text]
-        return len(got) >= len(prices) - 1, f"CSV has {len(got)}/{len(prices)} prices of the {cat} page"
+        loose = len(got) >= len(prices) - 1
+        dumped = bool(DUMP.search(text))  # eval_v2: the page's HTML saved as .csv holds every price, and is no CSV of them
+        ok = loose and not dumped
+        return ok, (f"CSV has {len(got)}/{len(prices)} prices of the {cat} page" + ("; the CSV is a dump of the page, not a table" if dumped else "")
+                    + f" [eval_v1: {'pass' if loose else 'fail'}; eval_v2: {'pass' if ok else 'fail'}; kind: m_csv]")
     return ("websites", "scrape a page to a file", f"Make a CSV with the title and price of each book listed on the first page of the {cat} "
             "category on books.toscrape.com.", check)
 

@@ -7,7 +7,7 @@ import datetime
 import re
 
 from training import hive_bench as B
-from training.kinds._common import FIND_AUTHOR, MONTHS, _fill, _says
+from training.kinds._common import FIND_AUTHOR, MONTHS, _fill, _states
 
 KIND = "h_age"
 FAMILY = "hard: websites"
@@ -32,8 +32,8 @@ def h_age(r):
         born = BeautifulSoup(B._get(f"https://quotes.toscrape.com/author/{AUTHORS[name]}/"), "html.parser").select_one(".author-born-date").text.strip()
         d = datetime.datetime.strptime(born, "%B %d, %Y").date()
         days = (on - d).days
-        ok = _says(B._body(report), days, 0.1)
-        return ok, f"born {born}; {days} days to {on}; in the answer: {ok}"
+        ok, why = _states(B._body(report), [days], 0.1, most=10, kind="h_age")  # the author page dumped would hold the date and much else
+        return ok, f"born {born}; {days} days to {on}; in the answer: {ok}" + (f"; {why}" if why else "")
     return ("hard: websites", "a fact from a site and a date sum on it", f"Open quotes.toscrape.com, find {name}'s author page and read the date "
             f"of birth there. How many days lie between that date and {on.day} {MONTHS[on.month - 1]} {on.year}?", check)
 

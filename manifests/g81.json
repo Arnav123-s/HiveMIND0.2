@@ -1,0 +1,13 @@
+{
+ "generation": "g81",
+ "role": "the body the loop resumes from (docs/RESUME-G81.md)",
+ "record": {"easy": [32, 32], "hard": [23, 32], "all": [55, 64], "talk": 8.2, "gate_seeds": "20000811-20000818", "source": "docs/reads/g81.md"},
+ "eval_bridge": {
+  "easy_v1_loose": {"passed": 32, "of": 32, "source": "g81 record (docs/reads/g81.md), registry-verified"},
+  "easy_v2_strict": null,
+  "per_kind": null,
+  "eval_v2_floor": null,
+  "decision": "pending: strict re-sit of g81 on its gate seeds (RESUME-G81 R6a), then scripts/rebaseline.py",
+  "rule": "Gemini ruling 2026-11-28: delta = 32 - easy_v2_strict; 0 -> floor 30/32; 1-2 -> 30 - delta with recovery targets; 3+ -> STOP, back to the manager"
+ }
+}
