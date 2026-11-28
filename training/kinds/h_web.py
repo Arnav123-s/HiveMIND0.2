@@ -7,7 +7,7 @@ import random
 import re
 
 from training import hive_bench as B
-from training.kinds._common import _fill, _nums
+from training.kinds._common import _fill, _nums, _states  # noqa: F401 (_nums: the lesson)
 
 KIND = "h_web"
 FAMILY = "hard: open web"
@@ -75,8 +75,9 @@ def h_web(r, pick=None):
 
     def check(run, report):
         vals = _web_values(qid, prop, units)
-        ok = any(abs(g - v) <= max(tol * abs(v), 0.5) for g in _nums(B._body(report)) for v in vals)
-        return ok, f"{name} ({qid}): Wikidata records {', '.join(f'{v:g}' for v in vals[:6])} {unit}; one of them in the answer: {ok}"
+        # "Answer with the number": answer-shaped (no page or JSON dump, few numbers), and one of them a recorded value
+        ok, why = _states(B._body(report), [vals], lambda v: max(tol * abs(v), 0.5), most=6) if vals else (False, "no value recorded")
+        return ok, f"{name} ({qid}): Wikidata records {', '.join(f'{v:g}' for v in vals[:6])} {unit}; one of them in the answer: {ok}" + (f" ({why})" if why else "")
     return ("hard: open web", "a fact found on the open web", f"Find {what.format(name=name, where=where)}, as Wikidata records it "
             f"(Wikidata item {qid}). Answer with the number.", check)
 

@@ -656,7 +656,8 @@ def gather(out, gen, old=(), new=(), log=print):
             if isinstance(row, dict):
                 row.setdefault("gen", gen)
                 lines_new.append(json.dumps(row))
-    kept = grow_record.union([lines_old, lines_new])
+    from training import quarantine
+    kept = quarantine.drop(grow_record.union([lines_old, lines_new]), log=log)  # audited bad rows never come back
     Path(out).parent.mkdir(parents=True, exist_ok=True)
     Path(out).write_text("".join(ln + "\n" for ln in kept))
     before = len(grow_record.union([lines_old]))
@@ -1547,7 +1548,8 @@ def train(rows_file, name, base="t17", epochs=2.0, rank=16, lr=2e-4, max_len=115
     random.seed(seed)
     torch.manual_seed(seed)
     from team import solo
-    rows = [json.loads(x) for x in Path(rows_file).read_text().splitlines() if x.strip()]
+    from training import quarantine
+    rows = quarantine.drop([json.loads(x) for x in Path(rows_file).read_text().splitlines() if x.strip()], log=log)
     for r in rows:  # rows made before the short orders existed carry the long ones: the taught member is trained under the short
         day = re.search(r"Today is (\d{4}-\d\d-\d\d \(\w+\))", r["messages"][0]["content"])
         r["messages"][0] = {"role": "system", "content": solo.SHORT.format(today=day.group(1) if day else time.strftime("%Y-%m-%d (%A)"))}

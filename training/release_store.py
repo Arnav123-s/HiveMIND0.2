@@ -8,7 +8,10 @@ read tries the releases in order. Nothing is deleted or moved. rows.jsonl and fa
     python3 training/release_store.py get NAME OUT     the file NAME from the first release that has it, saved as OUT
     python3 training/release_store.py put FILE ...      each file into the release that holds its name, else the first
                                                         with room (a new release is made when all are full)
-Needs GH_TOKEN and GITHUB_REPOSITORY for put."""
+Needs GH_TOKEN and GITHUB_REPOSITORY for put.
+
+HIVE_STORE=hf sends get and put to the Hugging Face store instead (training/hf_store.py): the new home has no
+releases and no Actions. Unset, everything below behaves exactly as it did."""
 import json
 import os
 import subprocess
@@ -31,8 +34,15 @@ def urls(name, repo=None):
     return [f"https://github.com/{repo}/releases/download/{t}/{name}" for t in tags()]
 
 
+def _hf():
+    return os.environ.get("HIVE_STORE", "").strip().lower() == "hf"
+
+
 def get(name, out, repo=None, fetch=urllib.request.urlretrieve):
     """True when NAME was found in one of the releases and saved as OUT."""
+    if _hf():
+        from training import hf_store
+        return hf_store.get(name, out)
     for url in urls(name, repo):
         try:
             fetch(url, out)
@@ -78,6 +88,9 @@ def place(files, held):
 
 
 def put(files, repo=None):
+    if _hf():
+        from training import hf_store
+        return hf_store.put(files)
     repo = repo or os.environ["GITHUB_REPOSITORY"]
     held = {t: _names(repo, t) for t in tags()}
     for tag, batch in place(files, held).items():

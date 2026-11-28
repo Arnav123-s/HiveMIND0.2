@@ -7,7 +7,7 @@ import datetime
 import re
 
 from training import hive_bench as B
-from training.kinds._common import _nums, _pypi, HARD_PACKAGES as PACKAGES
+from training.kinds._common import _dumped, _nums, _pypi, HARD_PACKAGES as PACKAGES
 
 KIND = "h_two"
 FAMILY = "hard: live facts"
@@ -27,8 +27,9 @@ def h_two(r):
         body = B._body(report)
         m = re.search(r"later\W+([\w.-]+)", body.lower())
         named = da == db or bool(m and m.group(1).strip(".") == later)
-        ok = named and any(abs(g - days) <= 1 for g in _nums(body))
-        return ok, f"{a} {da}, {b} {db}: {later} is later by {days} days; in the answer: {ok}"
+        why = _dumped(body, most=16)  # two versions and two dates are about 12 numbers; a dump of PyPI holds hundreds
+        ok = not why and named and any(abs(g - days) <= 1 for g in _nums(body))
+        return ok, f"{a} {da}, {b} {db}: {later} is later by {days} days; in the answer: {ok}" + (f" ({why})" if why else "")
     return ("hard: live facts", "two facts from two sources, combined", f"Look at the latest versions of the packages {a} and {b} on PyPI. "
             "Which of the two was released more recently, and how many days lie between the two release dates? Answer in two lines: "
             "'later: NAME' and 'days: N'.", check)
