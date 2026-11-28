@@ -1,7 +1,8 @@
 # Resuming the loop from g81 on the new compute
 
 **Status:** working runbook, accepted by the manager 2026-11-28 (easy floor 30/32 accepted; eval_v2 ruled for every
-web kind). Nothing has trained or run on Kaggle or Colab yet. R1 waits for the manager's go-ahead. **No long run
+web kind). **R1 ran on 2026-11-28 up to its pause (no upload): gate PASS, audit done (§11).** Nothing has trained,
+and nothing has run on Kaggle. The upload is the owner's decision. **No long run
 starts before the report-back point (step R5).** Owner: the council (manager Muse). Policy: `docs/REPO-POLICY.md`.
 GitHub Actions stays off: every step below runs in a notebook or on the owner's machine.
 
@@ -19,7 +20,7 @@ GitHub Actions stays off: every step below runs in a notebook or on the owner's 
 - **Council inputs folded in:**
   - **Neon (Gemini):** a site-walking capability check before g82 (§5, R4), and a pre-flight gate on every launch
     (§6).
-  - **Codex audit:** the open-web false positive. 7 rows are quarantined, the checker is fixed, g81 gets a
+  - **Codex audit:** the open-web false positive. 14 rows are quarantined (R1 found 8 for the g34 incident and a second incident of 6), the checker is fixed, g81 gets a
     behavioural web test, and the incidence is measured (§4, R1 and R4).
 - **Assumption on record:** the g38→g39 gate breach (easy 25/32 against C's floor of 28/32) is a **closed
   historical breach**, reconciled retroactively, with no rollback and no blocking authority over g82 (Neon ruling;
@@ -33,7 +34,7 @@ GitHub Actions stays off: every step below runs in a notebook or on the owner's 
 | F2 | The trainer uses the GPU only **without** `--int8-base` (`training/grow.py`, `gpu = cuda and not int8_base`). It then loads the 8B in bf16: about 16 GB of weights before activations. | It probably **does not fit a 16 GB Kaggle T4/P100** and should fit a Colab L4 (24 GB) or A100. Kaggle's GPU quota is not a t80 training lane without a code change (multi-GPU sharding). R3 measures this rather than assume it. |
 | F3 | Colab was never actually used: 34 of 34 recorded reads say "not seen" or "not there". | **GPU training time is completely unmeasured.** The only figure is CPU at 9–18 s a row (`training/colab.py`). |
 | F4 | Weights went through GitHub Releases (`training/release_store.py`). The new repo has none. | New `training/hf_store.py`, switched on with `HIVE_STORE=hf`: same get/put, one commit per put. |
-| F5 | `g39code` and `g44words2` are body cells, but **only their inference `.gguf` survived**: no `.safetensors`. The g82 trunk plan (`lineage.py trunk g82`) averages both. | `merge.py trunk` skips a missing leaf with a warning, so **g82's trunk would quietly lose two of its 18 leaves.** Recommended: rebuild both from their `.gguf` (`training/gguf_to_peft.py`, round trip tested; §9), validated in R1 on a cell that has both files. |
+| F5 | `g39code` and `g44words2` are body cells, but **only their inference `.gguf` survived**: no `.safetensors`. The g82 trunk plan (`lineage.py trunk g82`) averages both. | `merge.py trunk` skips a missing leaf with a warning, so **g82's trunk would quietly lose two of its 18 leaves.** **Ruled: rebuild** (§9). **R1 gate PASS:** both rebuilt and valid, so g82's trunk has 18 leaves (§11). |
 | F6 | g81's own new rows (about 786) and the cumulative `failures.jsonl` are not in the archive. | g82 trains on rows up to g80 plus its own. Dreams start with no old failures. |
 | F7 | The ternary runtime builds from source in about 25 min on 4 cores (`team.ternary install`). | Cache the built binary in the HF store, keyed by CPU flags (as the Actions cache was), or lose 25 min every session. |
 | F8 | **The open-web defect is still live in the code.** The shared check `_says` took any number of the text as the answer, and `h_walk` (the capability-check kind) used it too. | Fixed on this branch **before** any web evaluation, or Neon's check could produce a false PASS. Since the eval_v2 ruling: every web kind, the 5 hard and the 4 easy (§4). |
@@ -217,19 +218,24 @@ easy slice:
  "required_changes": [
   "HIVE_STORE=hf",
   "eval_v2: one answer standard for every web kind (5 hard + 4 easy)",
-  "training/data/QUARANTINE.jsonl filled by R1",
-  "g39code/g44words2 .safetensors rebuilt from .gguf (if ruled)"
- ],
- "trunk_leaves_missing": [
-  "g39code",
-  "g44words2"
+  "training/data/QUARANTINE.jsonl: 14 rows from R1's audit (committed)",
+  "g39code/g44words2 .safetensors rebuilt from .gguf (R1 gate PASS); in the store once the owner uploads"
  ],
  "waivers": [],
  "override": null,
  "dissent": [],
  "eval": "v2",
  "bridge": "manifests/g81.json",
- "recovery_targets": []
+ "recovery_targets": [],
+ "trunk": {
+  "leaves": 18,
+  "rebuilt_from_gguf": [
+   "g39code",
+   "g44words2"
+  ],
+  "basis": "R1 gate PASS (docs/r1/r1-report.json): t80.g81code and t80.g80words rebuilt from their .gguf matched their real .safetensors (max relative error 4.55e-4 / 4.68e-4 per matrix, 3.01e-4 / 2.97e-4 on B.A; limit 2e-3; no missing or extra tensors). Manager ruling on F5: rebuild, gated on this validation.",
+  "store_status": "rebuilt .safetensors staged in the R1 session; upload into the store is the owner's decision (notebook upload cell), not yet run"
+ }
 }
 ```
 
@@ -322,4 +328,35 @@ The last two differ only in bookkeeping. Either way, no future trunk could conta
 | `m_know` | the symbol and the atomic number both present | little |
 | `m_translate`, `m_summary` | keyword substrings (`m_summary` must also be one sentence) | little to some |
 | `m_follow`, `m_steps`, `_programs` | exact form, structured parts, hidden tests | strict |
+
+## 11. R1 results (2026-11-28, run to its pause; upload not run)
+
+Run by the manager with the owner in Colab. Results: `R1-results-20261128-031438` in the Drive recovery folder,
+copied to `docs/r1/`.
+
+- **Restore and extract:** 13 of 13 archives; 84 of 84 files, each matching its archive-map SHA-256.
+- **Gate: PASS.**
+
+  | Cell | Max relative error, per matrix | Max relative error, on B·A | Missing / extra |
+  |---|---|---|---|
+  | `t80.g81code` | 4.55e-4 | 3.01e-4 | none |
+  | `t80.g80words` | 4.68e-4 | 2.97e-4 | none |
+
+  The limit was 2e-3. `g39code` and `g44words2` were rebuilt with the same shape as the real cells (rank 16,
+  alpha 32, layers 22–35, 7 projections). **g82's trunk is 18 leaves**, not the 16-leaf fallback
+  (`manifests/g82.json`).
+- **Audit of `datasets/g80/rows.jsonl`:** 20,000 rows, of which 1,091 are web rows, and **14 flagged**, all
+  quarantined (`training/data/QUARANTINE.jsonl`).
+  - **The g34 incident** (seed 10003306): **8 rows, lines 1068–1075.** The Codex audit counted 7. Line 1075 is the
+    second member's `pair` row.
+  - **A second incident** (seed 30004256, a dream seed): **6 rows, lines 2706–2711.** Both members' answers were a
+    page or JSON dump. This one is not in the Codex audit.
+  - **Incidence:** "a fact found on the open web", 4 of 163 answers (2.45%: 2 tasks × 2 members). Every other web
+    kind: 0 (site + date sum 0/142, read + date sum 0/108, read from a source 0/71, operate a website 0/19, walk a
+    site 0/26).
+  - **Coverage limit:** 20,000 is the release's own cap (`grow_record.MOST_ROWS`). Older rows were dropped before
+    the backup and could not be audited. The incidence holds for the newest 20,000 rows only.
+- **F10:** 12 rows of "walk a site over several pages" from g38 survive (65 across g34–g74). They are training
+  rows, not g38code2's weights.
+- **Not run:** the upload (the owner's decision), so the store is still empty and R2 waits.
 

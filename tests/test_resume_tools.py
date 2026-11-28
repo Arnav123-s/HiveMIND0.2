@@ -467,3 +467,11 @@ def test_offline_easy_answers_that_enumerate_are_measured_not_scored(tmp_path):
         (d / tid / "exam.json").write_text(json.dumps({"id": tid, "ok": True, "why": "", "answer": ans}))
     got = {x["id"] for x in rebaseline.exposure(preflight.exam_results([d]))}
     assert got == {"e1_01", "e1_02"}
+
+
+def test_the_committed_quarantine_holds_both_r1_incidents():
+    from training import quarantine
+    rows = [json.loads(x) for x in quarantine.FILE.read_text().splitlines() if x.strip()]
+    assert len(rows) == len(quarantine.keys()) == 14
+    assert sorted(r["line"] for r in rows) == list(range(1068, 1076)) + list(range(2706, 2712))
+    assert {r["seed"] for r in rows} == {10003306, 30004256}

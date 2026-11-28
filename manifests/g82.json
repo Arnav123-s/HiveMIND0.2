@@ -13,17 +13,22 @@
  "required_changes": [
   "HIVE_STORE=hf",
   "eval_v2: one answer standard for every web kind (5 hard + 4 easy)",
-  "training/data/QUARANTINE.jsonl filled by R1",
-  "g39code/g44words2 .safetensors rebuilt from .gguf (if ruled)"
- ],
- "trunk_leaves_missing": [
-  "g39code",
-  "g44words2"
+  "training/data/QUARANTINE.jsonl: 14 rows from R1's audit (committed)",
+  "g39code/g44words2 .safetensors rebuilt from .gguf (R1 gate PASS); in the store once the owner uploads"
  ],
  "waivers": [],
  "override": null,
  "dissent": [],
  "eval": "v2",
  "bridge": "manifests/g81.json",
- "recovery_targets": []
+ "recovery_targets": [],
+ "trunk": {
+  "leaves": 18,
+  "rebuilt_from_gguf": [
+   "g39code",
+   "g44words2"
+  ],
+  "basis": "R1 gate PASS (docs/r1/r1-report.json): t80.g81code and t80.g80words rebuilt from their .gguf matched their real .safetensors (max relative error 4.55e-4 / 4.68e-4 per matrix, 3.01e-4 / 2.97e-4 on B.A; limit 2e-3; no missing or extra tensors). Manager ruling on F5: rebuild, gated on this validation.",
+  "store_status": "rebuilt .safetensors staged in the R1 session; upload into the store is the owner's decision (notebook upload cell), not yet run"
+ }
 }
