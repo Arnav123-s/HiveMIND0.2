@@ -98,7 +98,7 @@ def main(argv):
             f.write(f"{i}\t{r.get('kind')}\t{r.get('type')}\t{r.get('seed')}\t{r.get('member')}\t{quarantine.key(r)}\t{why}\n")
     print(f"written to {out}")
     if "--quarantine" in argv:
-        have = quarantine.keys()
+        have = quarantine.keys(building=True)  # the writer: a missing or empty file is where it starts
         new = [(i, r, w) for i, r, w in flagged if quarantine.key(r) not in have]
         with quarantine.FILE.open("a") as f:
             for i, r, why in new:

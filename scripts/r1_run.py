@@ -167,7 +167,7 @@ class Run:
         rows_file = self.stage / "rows.jsonl"
         rows, web, flagged, seen, bad = audit_web_rows.audit(rows_file)
         lines = {i for i, _r, _w in flagged}
-        have = quarantine.keys()
+        have = quarantine.keys(building=True)  # the writer: a missing or empty file is where it starts
         new = 0
         with quarantine.FILE.open("a") as f:
             for i, r, why in sorted(flagged, key=lambda x: x[0]):

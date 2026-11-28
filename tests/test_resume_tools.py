@@ -490,6 +490,9 @@ def test_verify_store_proves_each_kind_of_file_and_catches_a_mismatch(tmp_path, 
     monkeypatch.setitem(want, json_path, __import__("hashlib").sha256(body).hexdigest())
     monkeypatch.setattr(verify_store, "expected", lambda: dict(want))
     rebuilt_bytes = b"rebuilt adapter"
+    GGUF_BYTES = {src: f"gguf of {src}".encode() for src in verify_store.REBUILT.values()}
+    for src, b in GGUF_BYTES.items():
+        want[src] = __import__("hashlib").sha256(b).hexdigest()
     rh = __import__("hashlib").sha256(rebuilt_bytes).hexdigest()
 
     def entry(path, oid):
@@ -498,22 +501,32 @@ def test_verify_store_proves_each_kind_of_file_and_catches_a_mismatch(tmp_path, 
     tree += [entry(p, rh) for p in verify_store.REBUILT] + [entry(".gitattributes", None)]
 
     class Api:
+        def repo_info(self, *a, **k):
+            return type("Info", (), {"sha": "rev1"})()
+
         def list_repo_tree(self, *a, **k):
+            assert k["revision"] == "rev1"
             return tree
 
-    def download(repo_id, filename, repo_type, local_dir):
+    def download(repo_id, filename, repo_type, local_dir, revision):
+        assert revision == "rev1"
+        if filename in verify_store.REBUILT.values():  # the rebuild's source: hashed again, so it must be the real bytes
+            p = Path(local_dir) / filename
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_bytes(GGUF_BYTES[filename])
+            return str(p)
         p = Path(local_dir) / filename
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_bytes(body if filename == json_path else b"gguf")
         return str(p)
     rebuild = lambda gguf, out: (Path(out).parent.mkdir(parents=True, exist_ok=True), Path(out).write_bytes(rebuilt_bytes))  # noqa: E731
-    ok, res = verify_store.verify(Api(), "someone/store", download, rebuild=rebuild)
-    assert ok and res[json_path] == ("PROVEN", "downloaded, SHA-256 = extract-time SHA-256")
+    ok, res, rev = verify_store.verify(Api(), "someone/store", download, rebuild=rebuild)
+    assert ok and rev == "rev1" and res[json_path] == ("PROVEN", "downloaded, SHA-256 = extract-time SHA-256")
     assert res["g39/t80.g39code.safetensors"][0] == "PROVEN" and res[".gitattributes"][0] == "HF_OWN"
     assert sum(s == "PROVEN" for s, _ in res.values()) == 86
     bad = next(p for p in want if p.endswith(".gguf") and "g80" in p)
     tree[[getattr(e, "path", "") for e in tree].index(bad)] = entry(bad, "f" * 64)
-    ok, res = verify_store.verify(Api(), "someone/store", download, rebuild=rebuild)
+    ok, res, _rev = verify_store.verify(Api(), "someone/store", download, rebuild=rebuild)
     assert not ok and res[bad][0] == "MISMATCH"
 
 
@@ -544,3 +557,152 @@ def test_a_cell_rebuilt_twice_is_byte_identical(tmp_path):
                        check=True, capture_output=True)
         outs.append((tmp_path / f"r{i}" / "a.safetensors").read_bytes())
     assert outs[0] == outs[1]
+
+
+# --- the quarantine fails closed (audit 2026-11-28, training/quarantine.py) ---------------------------------------
+
+def _row(i):
+    return {"type": "done", "messages": [{"role": "user", "content": f"task {i}"}], "output": "DONE"}
+
+
+def test_a_missing_quarantine_stops_gather_and_train(tmp_path, monkeypatch):
+    import pytest
+    from training import grow, quarantine
+    monkeypatch.setattr(quarantine, "FILE", tmp_path / "absent.jsonl")
+    with pytest.raises(quarantine.QuarantineError, match="missing"):
+        quarantine.drop([_row(1)])
+    rows = tmp_path / "rows.jsonl"
+    rows.write_text(json.dumps(_row(1)) + "\n")
+    with pytest.raises(quarantine.QuarantineError):
+        grow.gather(str(tmp_path / "out.jsonl"), "g82", old=[str(rows)], new=[], log=lambda *a, **k: None)
+    assert not (tmp_path / "out.jsonl").exists()  # nothing written from an untrusted quarantine
+    with pytest.raises(quarantine.QuarantineError):
+        grow.train(str(rows), "probe", "t17", limit=1, log=lambda *a, **k: None)
+
+
+def test_an_empty_quarantine_stops_training(tmp_path, monkeypatch):
+    import pytest
+    from training import quarantine
+    for text in ("", "\n\n", "# only a comment\n"):
+        q = tmp_path / "Q.jsonl"
+        q.write_text(text)
+        monkeypatch.setattr(quarantine, "FILE", q)
+        with pytest.raises(quarantine.QuarantineError, match="no entries"):
+            quarantine.drop([_row(1)])
+
+
+def test_a_malformed_quarantine_entry_stops_training(tmp_path, monkeypatch):
+    import pytest
+    from training import quarantine
+    good = json.dumps({"sha256": quarantine.key(_row(1))})
+    for bad in ('{"sha256": "typo"}', '{"sha256": "' + "A" * 64 + '"}', '{"sha256": "' + "a" * 63 + '"}',
+                '{"sha256": 12}', '{"digest": "x"}', "not json", "[]"):
+        q = tmp_path / "Q.jsonl"
+        q.write_text(good + "\n" + bad + "\n")
+        monkeypatch.setattr(quarantine, "FILE", q)
+        with pytest.raises(quarantine.QuarantineError):
+            quarantine.drop([_row(1)])
+        with pytest.raises(quarantine.QuarantineError):  # even while building it
+            quarantine.keys(q, building=True)
+
+
+def test_the_valid_quarantine_drops_exactly_its_14_rows_and_nothing_else():
+    from training import quarantine
+    keys = quarantine.keys()
+    assert len(keys) == 14
+    entries = [json.loads(x) for x in quarantine.FILE.read_text().splitlines() if x.strip()]
+    marker = [{"_q": e["sha256"]} for e in entries]
+    clean = [_row(i) for i in range(50)]
+    orig_key = quarantine.key
+    try:  # rows whose key is exactly each quarantined digest, beside 50 clean rows
+        quarantine.key = lambda r: r["_q"] if "_q" in r else orig_key(r)
+        kept = quarantine.drop(marker + clean, log=lambda *a: None)
+    finally:
+        quarantine.key = orig_key
+    assert kept == clean
+
+
+def test_only_the_writer_may_start_from_no_quarantine(tmp_path):
+    from training import quarantine
+    assert quarantine.keys(tmp_path / "absent.jsonl", building=True) == set()
+    (tmp_path / "e.jsonl").write_text("")
+    assert quarantine.keys(tmp_path / "e.jsonl", building=True) == set()
+
+
+# --- the store verifier pins one revision and re-checks the rebuild's source (audit 2026-11-28) --------------------
+
+def _store(monkeypatch, tmp_path, second_fetch=None, revision="rev7"):
+    """A fake store of two proven .gguf and their rebuilt adapters. SECOND_FETCH: the store changed CONSISTENTLY after
+    the listing was read (the audit's scenario): each source .gguf now holds SECOND_FETCH and each stored adapter is the
+    rebuild of SECOND_FETCH, while the listing still shows the original .gguf's oid."""
+    import hashlib
+    import verify_store
+    from huggingface_hub.hf_api import RepoFile
+    gg = {src: f"real {src}".encode() for src in verify_store.REBUILT.values()}
+    want = {src: hashlib.sha256(b).hexdigest() for src, b in gg.items()}
+    monkeypatch.setattr(verify_store, "expected", lambda: dict(want))
+    rebuilt = lambda src_bytes: b"adapter from " + src_bytes  # noqa: E731
+    stored = {p: rebuilt(second_fetch if second_fetch is not None else gg[src]) for p, src in verify_store.REBUILT.items()}
+    tree = [RepoFile(path=p, size=1, blob_id="0" * 40, oid="0" * 40, lfs={"size": 1, "oid": h, "pointerSize": 1}) for p, h in want.items()]
+    tree += [RepoFile(path=p, size=1, blob_id="0" * 40, oid="0" * 40, lfs={"size": 1, "oid": hashlib.sha256(b).hexdigest(), "pointerSize": 1})
+             for p, b in stored.items()]
+    calls = []
+
+    class Api:
+        def repo_info(self, *a, **k):
+            return type("Info", (), {"sha": revision})()
+
+        def list_repo_tree(self, *a, **k):
+            calls.append(("list", k.get("revision")))
+            return tree
+
+    def download(repo_id, filename, repo_type, local_dir, revision):
+        calls.append((filename, revision))
+        data = gg.get(filename, stored.get(filename))
+        if second_fetch is not None and filename in gg:
+            data = second_fetch
+        p = Path(local_dir) / filename
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(data)
+        return str(p)
+
+    def rebuild(src, out):
+        Path(out).parent.mkdir(parents=True, exist_ok=True)
+        Path(out).write_bytes(rebuilt(Path(src).read_bytes()))
+    return Api(), download, rebuild, calls
+
+
+def test_a_changed_second_fetch_of_the_source_fails_the_adapter_proof(tmp_path, monkeypatch):
+    """The audit's case: the source .gguf is proven by its listed oid, but the bytes fetched for the rebuild are not
+    those bytes. The adapter must NOT be PROVEN, even though an adapter built from the swapped bytes would match it."""
+    import verify_store
+    api, download, rebuild, calls = _store(monkeypatch, tmp_path, second_fetch=b"a different gguf")
+    # the hole being closed: the swapped adapter IS the rebuild of the swapped .gguf, so a proof that did not re-check
+    # the fetched source would have found identical bytes and marked it PROVEN
+    import hashlib
+    assert hashlib.sha256(b"adapter from " + b"a different gguf").hexdigest() in {e.lfs.sha256 for e in api.list_repo_tree(revision="rev7")}
+    calls.clear()
+    ok, res, rev = verify_store.verify(api, "someone/store", download, rebuild=rebuild)
+    assert not ok
+    for p, src in verify_store.REBUILT.items():
+        assert res[src][0] == "PROVEN"  # by the listed oid: the listing was right
+        assert res[p][0] == "MISMATCH" and "is not the manifest's" in res[p][1]
+
+
+def test_every_read_is_made_at_the_one_resolved_revision_and_each_file_once(tmp_path, monkeypatch):
+    import verify_store
+    for download_all in (False, True):
+        api, download, rebuild, calls = _store(monkeypatch, tmp_path / str(download_all))
+        ok, res, rev = verify_store.verify(api, "someone/store", download, download_all=download_all, rebuild=rebuild)
+        assert ok and rev == "rev7"
+        assert {r for _f, r in calls} == {"rev7"}  # the listing and every download
+        files = [f for f, _r in calls if f != "list"]
+        assert len(files) == len(set(files))  # no file is read twice
+
+
+def test_no_proof_without_a_resolved_revision(tmp_path, monkeypatch):
+    import pytest
+    import verify_store
+    api, download, rebuild, _calls = _store(monkeypatch, tmp_path, revision=None)
+    with pytest.raises(SystemExit, match="revision"):
+        verify_store.verify(api, "someone/store", download, rebuild=rebuild)
