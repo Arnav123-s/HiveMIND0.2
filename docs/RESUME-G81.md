@@ -53,30 +53,36 @@ Each step names where it runs, how long it may take, what it produces, and the c
 - **Row audit and quarantine:** `scripts/audit_web_rows.py`, `training/quarantine.py`, and the checker fix in
   `training/kinds/`.
 - **Lost-cell rebuild:** `training/gguf_to_peft.py` (§9).
+- **R1 in one run:** `colab/r1_store_and_audit.ipynb` → `scripts/r1_run.py` over `manifests/r1-files.json`
+  (tests: `tests/test_r1_run.py`).
 - **eval_v2 re-baseline:** `scripts/rebaseline.py`, with `manifests/g81.json` (the bridge) and `manifests/g82.json`.
 - **Tests:** `tests/test_resume_tools.py`.
 
-### R1. Move the body into the store and audit the rows (Colab, CPU runtime, Drive mounted; at most 2 h; no model)
-1. Mount Drive. Reassemble and verify archive group `03` with the archive's own tool:
-   `python RESTORE.py --manifest RECOVERY-MANIFEST.json --only 03-released`. It checks every part's SHA-256.
-   Extract into an empty directory.
-2. With `HIVE_STORE=hf`, `HIVE_HF_REPO=asrinna118/hivemind-cells` and `HF_TOKEN` from Colab secrets, run
-   `python3 training/hf_store.py put` on `models/g81/*`, `models/g80/*`, `models/g73/*` and the two surviving
-   `.gguf` of `g39code`/`g44words2` (archive group `05`, saved as `t80+g39code.gguf`: rename to `t80.g39code.gguf`, the store's form), plus `datasets/g80/rows.jsonl` as `rows.jsonl`. Then run
-   `hf_store.py ls` and check the count: 82 release files + 2 + rows.
-3. `python3 scripts/audit_web_rows.py rows.jsonl --quarantine` on the g80 rows. **Pass:** lines 1068–1074 are among
-   the flagged rows (the confirmed incident). The script prints the **incidence by kind** across every
-   positively-labelled web answer, which answers the audit's open question. Commit the filled
-   `training/data/QUARANTINE.jsonl` and `runs/audit/web-rows.tsv`.
-4. Search the rows for any row of g38 on "walk a site over several pages" (F10) and record what is there.
-5. **Rebuild the lost `.safetensors` (F5, §9), validated first.**
-   - Validate on a cell that has both files:
-     `python3 training/gguf_to_peft.py t80.g81code.gguf check/adapter_model.safetensors --compare t80.g81code.safetensors`.
-     It must exit 0: same names and shapes, relative error under 2e-3 (f16 rounding is about 5e-4).
-   - If it does, rebuild both cells:
-     `python3 training/gguf_to_peft.py t80.g39code.gguf t80.g39code.safetensors` (and the same for `g44words2`),
-     then `hf_store.py put` both.
-   - If it fails, stop and report: g82's trunk then goes without them, by ruling (§9, fallback).
+### R1. Move the body into the store and audit the rows (Colab, CPU runtime, Drive mounted; 1–2 h; no model)
+
+**One execution:** open `colab/r1_store_and_audit.ipynb` in Colab and run its cells in order. It runs
+`scripts/r1_run.py` over the file list `manifests/r1-files.json`. **Waits for:** the owner's `HF_TOKEN` (a write
+token) in Colab's Secrets, and the manager's start signal.
+
+1. **restore:** checks `RESTORE.py` and `RECOVERY-MANIFEST.json` against the hashes the receipt recorded, then
+   reassembles only the **13 archives (3.4 GB)** that hold the needed files: `03-released-cells-and-rows-01…11`
+   and `05-installed-cells-before-g60-02/-07`. The archive's own tool checks every part's SHA-256 and each archive's.
+2. **extract:** takes out exactly **84 files**: all 81 g73/g80/g81 release files, `datasets/g80/rows.jsonl`, and the
+   `.gguf` of `g39code`/`g44words2`, renamed to the store's form `t80.<cell>.gguf`. **Each file is checked against
+   its SHA-256 in the archive map.** Only names from the list are written; no path from inside an archive is used.
+3. **validate, the hard gate (manager ruling on F5):** rebuilds `t80.g81code` **and** `t80.g80words` from their
+   `.gguf` and compares each with its real `.safetensors`. Both must pass (relative error < 2e-3, the same names and
+   shapes). **Only then** are `g39code` and `g44words2` rebuilt. If either check fails, nothing is rebuilt, and the
+   report says g82's trunk falls back to 16 leaves, logged.
+4. **audit:** `scripts/audit_web_rows.py`'s check on the g80 rows. It reports the incidence by kind, whether lines
+   1068–1074 (the confirmed incident) are flagged, and the g38 "walk a site" rows (F10). It appends the flagged rows'
+   keys to `training/data/QUARANTINE.jsonl`.
+   **The notebook stops here** (cell 5) so the gate and the audit can be read before anything is uploaded.
+5. **upload:** the staged files, plus the rebuilt ones if the gate passed, go into the private store, one commit
+   per generation. Each commit is read back and compared by SHA-256, and the store is listed.
+6. **report:** `r1-report.json`, `QUARANTINE.jsonl`, `web-rows.tsv` and `validation.json` are written to a new
+   folder `R1-results-<time>` inside the Drive recovery folder. Those come back into the repo: the quarantine keys
+   are committed, and the manifests are updated with the gate result.
 
 ### R2. Stage probe on Kaggle (CPU session; at most 3 h)
 `HIVE_STORE=hf DNA=t80 python3 scripts/stage_probe.py --rows rows.jsonl` covers env, store, install, practice,
@@ -287,7 +293,7 @@ Leaving that leaf out changed it by **0.36**. Those synthetic leaves were indepe
 effect (real cells are correlated), but the gap is three orders of magnitude.
 
 **Not yet tested:** a real cell. The pair `t80.g81code.gguf` / `.safetensors` is in the archive but over the 10 MB
-connector limit, hence the validation in R1 step 5. A real t80 cell matches rank 16 on the last 14 of 36 layers,
+connector limit, hence the validation in R1 step 3 (validate). A real t80 cell matches rank 16 on the last 14 of 36 layers,
 float32: 14 × 1.212 M parameters × 4 B = 67.88 MB, the released `.safetensors` exactly.
 
 **Cost of each option in capability terms:**
