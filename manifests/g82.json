@@ -34,9 +34,42 @@
  "store": {
   "repo": "asrinna118/hivemind-cells",
   "private": true,
+  "private_source": "the keeper, from the Hugging Face API, 2026-11-28",
   "files_uploaded": 86,
   "store_listing": 87,
-  "note": "the 87th listed file is most likely Hugging Face's own .gitattributes (unverified from here)",
-  "results": "R1-results-20261128-035957"
+  "87th_file": ".gitattributes (Hugging Face's own; confirmed in the keeper's listing)",
+  "results": "R1-results-20261128-035957",
+  "verification": {
+   "proven_by_hash": 51,
+   "of": 86,
+   "how": "the keeper's API listing (LFS oid = SHA-256 of the bytes) compared with the extract-time SHA-256 in manifests/r1-files.json, file by file (docs/r1/store-listing-check.tsv); the R1 read-back's 6 files are among the 51",
+   "unproven": {
+    "listing_mis_copied": {
+     "count": 6,
+     "files": [
+      "g80/t80.g80data.safetensors",
+      "g80/t80.g80words2.safetensors",
+      "g80/t80.g80data.gguf",
+      "g73/t80.g73data2.safetensors",
+      "g80/t80.g80data2.gguf",
+      "g81/t80.g81sources2.gguf"
+     ],
+     "why": "two listed hashes differ from the record by one character, four are not 64 hex characters; sizes all match. Most likely copying errors in the listing, not in the store: unproven either way"
+    },
+    "json_sidecars": {
+     "count": 27,
+     "why": "the listing gives git blob ids (SHA-1), not comparable with the recorded SHA-256; all 27 sizes match"
+    },
+    "rebuilt_adapters": {
+     "count": 2,
+     "files": [
+      "g39/t80.g39code.safetensors",
+      "g44/t80.g44words2.safetensors"
+     ],
+     "why": "made in R1, not extracted: no hash of them was recorded anywhere (r1-report.json, validation.json, docs/r1/ hold none); sizes 67,921,440 B equal the real cells'"
+    }
+   },
+   "closing_step": "python3 scripts/verify_store.py --repo asrinna118/hivemind-cells (needs HF_TOKEN): reads the listing from the API itself, downloads and hashes the 27 sidecars, rebuilds the two adapters from the store's proven .gguf (byte-deterministic) and compares; --download-all also hashes every LFS file locally. Not yet run."
+  }
  }
 }

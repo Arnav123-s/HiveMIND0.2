@@ -239,10 +239,43 @@ easy slice:
  "store": {
   "repo": "asrinna118/hivemind-cells",
   "private": true,
+  "private_source": "the keeper, from the Hugging Face API, 2026-11-28",
   "files_uploaded": 86,
   "store_listing": 87,
-  "note": "the 87th listed file is most likely Hugging Face's own .gitattributes (unverified from here)",
-  "results": "R1-results-20261128-035957"
+  "87th_file": ".gitattributes (Hugging Face's own; confirmed in the keeper's listing)",
+  "results": "R1-results-20261128-035957",
+  "verification": {
+   "proven_by_hash": 51,
+   "of": 86,
+   "how": "the keeper's API listing (LFS oid = SHA-256 of the bytes) compared with the extract-time SHA-256 in manifests/r1-files.json, file by file (docs/r1/store-listing-check.tsv); the R1 read-back's 6 files are among the 51",
+   "unproven": {
+    "listing_mis_copied": {
+     "count": 6,
+     "files": [
+      "g80/t80.g80data.safetensors",
+      "g80/t80.g80words2.safetensors",
+      "g80/t80.g80data.gguf",
+      "g73/t80.g73data2.safetensors",
+      "g80/t80.g80data2.gguf",
+      "g81/t80.g81sources2.gguf"
+     ],
+     "why": "two listed hashes differ from the record by one character, four are not 64 hex characters; sizes all match. Most likely copying errors in the listing, not in the store: unproven either way"
+    },
+    "json_sidecars": {
+     "count": 27,
+     "why": "the listing gives git blob ids (SHA-1), not comparable with the recorded SHA-256; all 27 sizes match"
+    },
+    "rebuilt_adapters": {
+     "count": 2,
+     "files": [
+      "g39/t80.g39code.safetensors",
+      "g44/t80.g44words2.safetensors"
+     ],
+     "why": "made in R1, not extracted: no hash of them was recorded anywhere (r1-report.json, validation.json, docs/r1/ hold none); sizes 67,921,440 B equal the real cells'"
+    }
+   },
+   "closing_step": "python3 scripts/verify_store.py --repo asrinna118/hivemind-cells (needs HF_TOKEN): reads the listing from the API itself, downloads and hashes the 27 sidecars, rebuilds the two adapters from the store's proven .gguf (byte-deterministic) and compares; --download-all also hashes every LFS file locally. Not yet run."
+  }
  }
 }
 ```
@@ -370,7 +403,20 @@ copied to `docs/r1/`.
   `docs/r1/r1-report-upload.json`).
   - The private repo `asrinna118/hivemind-cells` holds **86 files (~3.3 GB)**, one commit per group: g39 2,
     g44 2, g73 27, g80 27, g81 27, shared 1.
-  - One file of each commit was read back and its SHA-256 matched, and every staged file is listed.
-  - The store lists 87 files. The extra one is most likely Hugging Face's own `.gitattributes` (unverified).
+  - Private, per the keeper's check of the Hugging Face API. The 87th listed file is Hugging Face's own
+    `.gitattributes`.
+  - **Verification coverage: 51 of 86 files proven by hash.** The method: each SHA-256 (LFS oid) in the keeper's API
+    listing was compared with the extract-time SHA-256 in `manifests/r1-files.json`, file by file
+    (`docs/r1/store-listing-check.tsv`). The upload's read-back of 6 files is included in the 51.
+  - **35 files are not proven:**
+    - **6 have listing hashes that can't be read.** Two differ from the record by one character, and four are not 64
+      hex characters. All sizes match, so these are most likely copying errors in the listing, not in the store, but
+      they are unproven either way. The six are `g80data.safetensors`, `g80words2.safetensors`, `g80data.gguf`,
+      `g73data2.safetensors`, `g80data2.gguf` and `g81sources2.gguf`.
+    - **27 `.json` sidecars:** the listing gives git blob ids, not SHA-256. All 27 sizes match.
+    - **The 2 rebuilt adapters** (`g39code`, `g44words2` `.safetensors`): no hash was ever recorded for them.
+  - **To close all 35:** run `scripts/verify_store.py` with the token. It reads the listing from the API itself (no
+    copying), downloads and hashes the sidecars, and rebuilds the two adapters from the store's proven `.gguf`. The
+    rebuild is byte-deterministic (tested), so identical bytes prove them. Not yet run.
 - **R2 waits** for the manager's go-ahead.
 
