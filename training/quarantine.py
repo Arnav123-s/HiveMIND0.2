@@ -8,8 +8,9 @@ writes the entries; training/grow.py gather and train drop every quarantined row
 from the archive: the rows stay in datasets/g80/rows.jsonl on Drive as audit evidence.
 
 First entries (Codex audit, 2026-11-28): g34 task h10003306_01 (the Platte River, Wikidata Q655754), two members
-answered with a dump of Wikidata's page and were marked right; seven rows of datasets/g80/rows.jsonl (lines
-1068-1074) teach it. Their keys are filled in by running the audit on that file (docs/RESUME-G81.md, step R1).
+answered with a dump of Wikidata's page and were marked right. The audit counted seven rows (lines 1068-1074).
+R1's audit (2026-11-28, docs/r1/) found the eighth, line 1075, the second member's pair row, and a second incident
+of the same kind (seed 30004256, lines 2706-2711, a page or JSON dump). All 14 keys are in the file.
 """
 import hashlib
 import json

@@ -467,3 +467,80 @@ def test_offline_easy_answers_that_enumerate_are_measured_not_scored(tmp_path):
         (d / tid / "exam.json").write_text(json.dumps({"id": tid, "ok": True, "why": "", "answer": ans}))
     got = {x["id"] for x in rebaseline.exposure(preflight.exam_results([d]))}
     assert got == {"e1_01", "e1_02"}
+
+
+def test_the_committed_quarantine_holds_both_r1_incidents():
+    from training import quarantine
+    rows = [json.loads(x) for x in quarantine.FILE.read_text().splitlines() if x.strip()]
+    assert len(rows) == len(quarantine.keys()) == 14
+    assert sorted(r["line"] for r in rows) == list(range(1068, 1076)) + list(range(2706, 2712))
+    assert {r["seed"] for r in rows} == {10003306, 30004256}
+
+
+# --- scripts/verify_store.py: every stored file against the extract-time record -----------------------------------
+
+def test_verify_store_proves_each_kind_of_file_and_catches_a_mismatch(tmp_path, monkeypatch):
+    import verify_store
+    from huggingface_hub.hf_api import RepoFile, RepoFolder
+    from training import hf_store
+    rec = json.loads((ROOT / "manifests" / "r1-files.json").read_text())
+    want = {hf_store.path_in_store(f["store_name"]): f["sha256"] for a in rec["archives"].values() for f in a["files"]}
+    json_path = next(p for p in want if p.endswith(".json"))
+    body = b'{"a sidecar": 1}'
+    monkeypatch.setitem(want, json_path, __import__("hashlib").sha256(body).hexdigest())
+    monkeypatch.setattr(verify_store, "expected", lambda: dict(want))
+    rebuilt_bytes = b"rebuilt adapter"
+    rh = __import__("hashlib").sha256(rebuilt_bytes).hexdigest()
+
+    def entry(path, oid):
+        return RepoFile(path=path, size=1, blob_id="0" * 40, oid="0" * 40, lfs={"size": 1, "oid": oid, "pointerSize": 1} if oid else None)
+    tree = [RepoFolder(path="g81", oid="0" * 40)] + [entry(p, None if p == json_path else h) for p, h in want.items()]
+    tree += [entry(p, rh) for p in verify_store.REBUILT] + [entry(".gitattributes", None)]
+
+    class Api:
+        def list_repo_tree(self, *a, **k):
+            return tree
+
+    def download(repo_id, filename, repo_type, local_dir):
+        p = Path(local_dir) / filename
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(body if filename == json_path else b"gguf")
+        return str(p)
+    rebuild = lambda gguf, out: (Path(out).parent.mkdir(parents=True, exist_ok=True), Path(out).write_bytes(rebuilt_bytes))  # noqa: E731
+    ok, res = verify_store.verify(Api(), "someone/store", download, rebuild=rebuild)
+    assert ok and res[json_path] == ("PROVEN", "downloaded, SHA-256 = extract-time SHA-256")
+    assert res["g39/t80.g39code.safetensors"][0] == "PROVEN" and res[".gitattributes"][0] == "HF_OWN"
+    assert sum(s == "PROVEN" for s, _ in res.values()) == 86
+    bad = next(p for p in want if p.endswith(".gguf") and "g80" in p)
+    tree[[getattr(e, "path", "") for e in tree].index(bad)] = entry(bad, "f" * 64)
+    ok, res = verify_store.verify(Api(), "someone/store", download, rebuild=rebuild)
+    assert not ok and res[bad][0] == "MISMATCH"
+
+
+def test_a_cell_rebuilt_twice_is_byte_identical(tmp_path):
+    """What proves the stored rebuilt adapters: the rebuild is deterministic, so rebuilding from the store's proven
+    .gguf must give the stored file's exact bytes."""
+    import subprocess
+    import numpy as np
+    from safetensors.numpy import save_file
+    from training import gguf_to_peft
+    base, cell = tmp_path / "base", tmp_path / "cell"
+    base.mkdir(); cell.mkdir()
+    (base / "config.json").write_text(json.dumps({"architectures": ["Qwen3ForCausalLM"], "model_type": "qwen3", "hidden_size": 64,
+        "intermediate_size": 192, "num_hidden_layers": 2, "num_attention_heads": 4, "num_key_value_heads": 2, "head_dim": 16,
+        "vocab_size": 256, "max_position_embeddings": 512, "rms_norm_eps": 1e-6, "rope_theta": 1e6, "tie_word_embeddings": False}))
+    rng = np.random.default_rng(5)
+    t = {f"base_model.model.model.layers.1.self_attn.q_proj.lora_A.weight": rng.standard_normal((16, 64)).astype(np.float32),
+         f"base_model.model.model.layers.1.self_attn.q_proj.lora_B.weight": rng.standard_normal((64, 16)).astype(np.float32)}
+    save_file(t, str(cell / "adapter_model.safetensors"))
+    (cell / "adapter_config.json").write_text(json.dumps({"peft_type": "LORA", "task_type": "CAUSAL_LM", "r": 16, "lora_alpha": 32,
+        "target_modules": ["q_proj"], "layers_to_transform": [1], "base_model_name_or_path": str(base)}))
+    conv = ROOT / "training" / "llama_cpp_convert"
+    subprocess.run([sys.executable, str(conv / "convert_lora_to_gguf.py"), "--base", str(base), "--outfile", str(tmp_path / "c.gguf"),
+                    "--outtype", "f16", str(cell)], check=True, capture_output=True, env={**__import__("os").environ, "PYTHONPATH": f"{conv / 'gguf-py'}:{conv}"})
+    outs = []
+    for i in range(2):
+        subprocess.run([sys.executable, str(ROOT / "training" / "gguf_to_peft.py"), str(tmp_path / "c.gguf"), str(tmp_path / f"r{i}" / "a.safetensors")],
+                       check=True, capture_output=True)
+        outs.append((tmp_path / f"r{i}" / "a.safetensors").read_bytes())
+    assert outs[0] == outs[1]

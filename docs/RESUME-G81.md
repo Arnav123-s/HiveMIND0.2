@@ -1,7 +1,8 @@
 # Resuming the loop from g81 on the new compute
 
 **Status:** working runbook, accepted by the manager 2026-11-28 (easy floor 30/32 accepted; eval_v2 ruled for every
-web kind). Nothing has trained or run on Kaggle or Colab yet. R1 waits for the manager's go-ahead. **No long run
+web kind). **R1 is done (2026-11-28): gate PASS, audit done, store populated (`asrinna118/hivemind-cells`, private;
+§11).** Nothing has trained, and nothing has run on Kaggle. R2 waits for the manager's go-ahead. **No long run
 starts before the report-back point (step R5).** Owner: the council (manager Muse). Policy: `docs/REPO-POLICY.md`.
 GitHub Actions stays off: every step below runs in a notebook or on the owner's machine.
 
@@ -19,7 +20,7 @@ GitHub Actions stays off: every step below runs in a notebook or on the owner's 
 - **Council inputs folded in:**
   - **Neon (Gemini):** a site-walking capability check before g82 (§5, R4), and a pre-flight gate on every launch
     (§6).
-  - **Codex audit:** the open-web false positive. 7 rows are quarantined, the checker is fixed, g81 gets a
+  - **Codex audit:** the open-web false positive. 14 rows are quarantined (R1 found 8 for the g34 incident and a second incident of 6), the checker is fixed, g81 gets a
     behavioural web test, and the incidence is measured (§4, R1 and R4).
 - **Assumption on record:** the g38→g39 gate breach (easy 25/32 against C's floor of 28/32) is a **closed
   historical breach**, reconciled retroactively, with no rollback and no blocking authority over g82 (Neon ruling;
@@ -33,7 +34,7 @@ GitHub Actions stays off: every step below runs in a notebook or on the owner's 
 | F2 | The trainer uses the GPU only **without** `--int8-base` (`training/grow.py`, `gpu = cuda and not int8_base`). It then loads the 8B in bf16: about 16 GB of weights before activations. | It probably **does not fit a 16 GB Kaggle T4/P100** and should fit a Colab L4 (24 GB) or A100. Kaggle's GPU quota is not a t80 training lane without a code change (multi-GPU sharding). R3 measures this rather than assume it. |
 | F3 | Colab was never actually used: 34 of 34 recorded reads say "not seen" or "not there". | **GPU training time is completely unmeasured.** The only figure is CPU at 9–18 s a row (`training/colab.py`). |
 | F4 | Weights went through GitHub Releases (`training/release_store.py`). The new repo has none. | New `training/hf_store.py`, switched on with `HIVE_STORE=hf`: same get/put, one commit per put. |
-| F5 | `g39code` and `g44words2` are body cells, but **only their inference `.gguf` survived**: no `.safetensors`. The g82 trunk plan (`lineage.py trunk g82`) averages both. | `merge.py trunk` skips a missing leaf with a warning, so **g82's trunk would quietly lose two of its 18 leaves.** Recommended: rebuild both from their `.gguf` (`training/gguf_to_peft.py`, round trip tested; §9), validated in R1 on a cell that has both files. |
+| F5 | `g39code` and `g44words2` are body cells, but **only their inference `.gguf` survived**: no `.safetensors`. The g82 trunk plan (`lineage.py trunk g82`) averages both. | `merge.py trunk` skips a missing leaf with a warning, so **g82's trunk would quietly lose two of its 18 leaves.** **Ruled: rebuild** (§9). **R1 gate PASS:** both rebuilt and valid, so g82's trunk has 18 leaves (§11). |
 | F6 | g81's own new rows (about 786) and the cumulative `failures.jsonl` are not in the archive. | g82 trains on rows up to g80 plus its own. Dreams start with no old failures. |
 | F7 | The ternary runtime builds from source in about 25 min on 4 cores (`team.ternary install`). | Cache the built binary in the HF store, keyed by CPU flags (as the Actions cache was), or lose 25 min every session. |
 | F8 | **The open-web defect is still live in the code.** The shared check `_says` took any number of the text as the answer, and `h_walk` (the capability-check kind) used it too. | Fixed on this branch **before** any web evaluation, or Neon's check could produce a false PASS. Since the eval_v2 ruling: every web kind, the 5 hard and the 4 easy (§4). |
@@ -217,19 +218,59 @@ easy slice:
  "required_changes": [
   "HIVE_STORE=hf",
   "eval_v2: one answer standard for every web kind (5 hard + 4 easy)",
-  "training/data/QUARANTINE.jsonl filled by R1",
-  "g39code/g44words2 .safetensors rebuilt from .gguf (if ruled)"
- ],
- "trunk_leaves_missing": [
-  "g39code",
-  "g44words2"
+  "training/data/QUARANTINE.jsonl: 14 rows from R1's audit (committed)",
+  "g39code/g44words2 .safetensors rebuilt from .gguf (R1 gate PASS), in the store"
  ],
  "waivers": [],
  "override": null,
  "dissent": [],
  "eval": "v2",
  "bridge": "manifests/g81.json",
- "recovery_targets": []
+ "recovery_targets": [],
+ "trunk": {
+  "leaves": 18,
+  "rebuilt_from_gguf": [
+   "g39code",
+   "g44words2"
+  ],
+  "basis": "R1 gate PASS (docs/r1/r1-report.json): t80.g81code and t80.g80words rebuilt from their .gguf matched their real .safetensors (max relative error 4.55e-4 / 4.68e-4 per matrix, 3.01e-4 / 2.97e-4 on B.A; limit 2e-3; no missing or extra tensors). Manager ruling on F5: rebuild, gated on this validation.",
+  "store_status": "in the store: uploaded 2026-11-27 20:06 PT, owner-approved: private repo asrinna118/hivemind-cells, 86 files (~3.3 GB), one commit per group (g39: 2, g44: 2, g73: 27, g80: 27, g81: 27, shared: 1), one file of each commit read back and SHA-256 matched, every staged file listed; results R1-results-20261128-035957 in the Drive recovery folder (docs/r1/r1-report-upload.json)"
+ },
+ "store": {
+  "repo": "asrinna118/hivemind-cells",
+  "private": true,
+  "private_source": "the keeper, from the Hugging Face API, 2026-11-28",
+  "files_uploaded": 86,
+  "store_listing": 87,
+  "87th_file": ".gitattributes (Hugging Face's own; confirmed in the keeper's listing)",
+  "results": "R1-results-20261128-035957",
+  "verification": {
+   "final": {
+    "proven": 86,
+    "of": 86,
+    "verdict": "ALL PROVEN",
+    "hf_own": 1,
+    "by": {
+     "downloaded_and_hashed": 84,
+     "rebuilt_byte_identical": 2
+    },
+    "detail": "every stored file downloaded and its SHA-256 computed locally, equal to the extract-time SHA-256 in manifests/r1-files.json (84 files, closing the 6 unreadable listing entries and the 27 sidecars); g39/t80.g39code.safetensors and g44/t80.g44words2.safetensors rebuilt from the store's proven .gguf with identical bytes (2 files). 0 mismatches, 0 failures; .gitattributes is Hugging Face's own.",
+    "run": "scripts/verify_store.py --repo asrinna118/hivemind-cells --download-all, Colab, the owner's session, 2026-11-27 ~21:32 PT, exit 0",
+    "result_file": {
+     "path": "HiveMIND recovery \u2014 2026-11-26/Store-verify-results-20261128-0532/store-verify.json (Google Drive)",
+     "bytes": 10373,
+     "sha256": "1f35cedfc6c665778cf769869c29bcd44c2f6caa836ea37a57c22a0994efe8c6",
+     "copy": "docs/r1/store-verify.json"
+    },
+    "run_output": "Store-verify-results-20261128-0532/store-verify-run-output.txt"
+   },
+   "superseded": {
+    "proven_by_hash": 51,
+    "of": 86,
+    "note": "the earlier 51/86 from a hand-copied listing (docs/r1/store-listing-check.tsv); kept as the record of what that listing could prove"
+   }
+  }
+ }
 }
 ```
 
@@ -322,4 +363,54 @@ The last two differ only in bookkeeping. Either way, no future trunk could conta
 | `m_know` | the symbol and the atomic number both present | little |
 | `m_translate`, `m_summary` | keyword substrings (`m_summary` must also be one sentence) | little to some |
 | `m_follow`, `m_steps`, `_programs` | exact form, structured parts, hidden tests | strict |
+
+## 11. R1 results (2026-11-28; upload done by the owner)
+
+Run by the manager with the owner in Colab. Results: `R1-results-20261128-031438` in the Drive recovery folder,
+copied to `docs/r1/`.
+
+- **Restore and extract:** 13 of 13 archives; 84 of 84 files, each matching its archive-map SHA-256.
+- **Gate: PASS.**
+
+  | Cell | Max relative error, per matrix | Max relative error, on B·A | Missing / extra |
+  |---|---|---|---|
+  | `t80.g81code` | 4.55e-4 | 3.01e-4 | none |
+  | `t80.g80words` | 4.68e-4 | 2.97e-4 | none |
+
+  The limit was 2e-3. `g39code` and `g44words2` were rebuilt with the same shape as the real cells (rank 16,
+  alpha 32, layers 22–35, 7 projections). **g82's trunk is 18 leaves**, not the 16-leaf fallback
+  (`manifests/g82.json`).
+- **Audit of `datasets/g80/rows.jsonl`:** 20,000 rows, of which 1,091 are web rows, and **14 flagged**, all
+  quarantined (`training/data/QUARANTINE.jsonl`).
+  - **The g34 incident** (seed 10003306): **8 rows, lines 1068–1075.** The Codex audit counted 7. Line 1075 is the
+    second member's `pair` row.
+  - **A second incident** (seed 30004256, a dream seed): **6 rows, lines 2706–2711.** Both members' answers were a
+    page or JSON dump. This one is not in the Codex audit.
+  - **Incidence:** "a fact found on the open web", 4 of 163 answers (2.45%: 2 tasks × 2 members). Every other web
+    kind: 0 (site + date sum 0/142, read + date sum 0/108, read from a source 0/71, operate a website 0/19, walk a
+    site 0/26).
+  - **Coverage limit:** 20,000 is the release's own cap (`grow_record.MOST_ROWS`). Older rows were dropped before
+    the backup and could not be audited. The incidence holds for the newest 20,000 rows only.
+- **F10:** 12 rows of "walk a site over several pages" from g38 survive (65 across g34–g74). They are training
+  rows, not g38code2's weights.
+- **Upload: done** (owner-approved, 2026-11-27 20:06 PT; results `R1-results-20261128-035957`, copied as
+  `docs/r1/r1-report-upload.json`).
+  - The private repo `asrinna118/hivemind-cells` holds **86 files (~3.3 GB)**, one commit per group: g39 2,
+    g44 2, g73 27, g80 27, g81 27, shared 1.
+  - Private, per the keeper's check of the Hugging Face API. The 87th listed file is Hugging Face's own
+    `.gitattributes`.
+  - **Verification coverage: 86 of 86 files proven ("ALL PROVEN").** The run:
+    `scripts/verify_store.py --repo asrinna118/hivemind-cells --download-all`, in Colab in the owner's session,
+    2026-11-27 ~21:32 PT, exit 0.
+    - **84 files** were downloaded and hashed locally, and each SHA-256 equals the extract-time SHA-256 in
+      `manifests/r1-files.json`. This closes the 6 listing entries that couldn't be read and the 27 sidecars.
+    - **2 files**, the rebuilt `g39code` and `g44words2` `.safetensors`, were rebuilt from the store's proven
+      `.gguf` with identical bytes.
+    - 0 mismatches, 0 failures. `.gitattributes` is Hugging Face's own file.
+  - **Result file:** `store-verify.json` (10,373 B, SHA-256 `1f35cedf…efe8c6`), in the Drive recovery folder under
+    `Store-verify-results-20261128-0532/`, with `store-verify-run-output.txt`. A copy is at
+    `docs/r1/store-verify.json`.
+  - The earlier figure, 51 of 86, came from a hand-copied listing (`docs/r1/store-listing-check.tsv`) and is
+    superseded.
+- **R2 waits** for the manager's go-ahead.
 

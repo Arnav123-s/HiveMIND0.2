@@ -13,17 +13,57 @@
  "required_changes": [
   "HIVE_STORE=hf",
   "eval_v2: one answer standard for every web kind (5 hard + 4 easy)",
-  "training/data/QUARANTINE.jsonl filled by R1",
-  "g39code/g44words2 .safetensors rebuilt from .gguf (if ruled)"
- ],
- "trunk_leaves_missing": [
-  "g39code",
-  "g44words2"
+  "training/data/QUARANTINE.jsonl: 14 rows from R1's audit (committed)",
+  "g39code/g44words2 .safetensors rebuilt from .gguf (R1 gate PASS), in the store"
  ],
  "waivers": [],
  "override": null,
  "dissent": [],
  "eval": "v2",
  "bridge": "manifests/g81.json",
- "recovery_targets": []
+ "recovery_targets": [],
+ "trunk": {
+  "leaves": 18,
+  "rebuilt_from_gguf": [
+   "g39code",
+   "g44words2"
+  ],
+  "basis": "R1 gate PASS (docs/r1/r1-report.json): t80.g81code and t80.g80words rebuilt from their .gguf matched their real .safetensors (max relative error 4.55e-4 / 4.68e-4 per matrix, 3.01e-4 / 2.97e-4 on B.A; limit 2e-3; no missing or extra tensors). Manager ruling on F5: rebuild, gated on this validation.",
+  "store_status": "in the store: uploaded 2026-11-27 20:06 PT, owner-approved: private repo asrinna118/hivemind-cells, 86 files (~3.3 GB), one commit per group (g39: 2, g44: 2, g73: 27, g80: 27, g81: 27, shared: 1), one file of each commit read back and SHA-256 matched, every staged file listed; results R1-results-20261128-035957 in the Drive recovery folder (docs/r1/r1-report-upload.json)"
+ },
+ "store": {
+  "repo": "asrinna118/hivemind-cells",
+  "private": true,
+  "private_source": "the keeper, from the Hugging Face API, 2026-11-28",
+  "files_uploaded": 86,
+  "store_listing": 87,
+  "87th_file": ".gitattributes (Hugging Face's own; confirmed in the keeper's listing)",
+  "results": "R1-results-20261128-035957",
+  "verification": {
+   "final": {
+    "proven": 86,
+    "of": 86,
+    "verdict": "ALL PROVEN",
+    "hf_own": 1,
+    "by": {
+     "downloaded_and_hashed": 84,
+     "rebuilt_byte_identical": 2
+    },
+    "detail": "every stored file downloaded and its SHA-256 computed locally, equal to the extract-time SHA-256 in manifests/r1-files.json (84 files, closing the 6 unreadable listing entries and the 27 sidecars); g39/t80.g39code.safetensors and g44/t80.g44words2.safetensors rebuilt from the store's proven .gguf with identical bytes (2 files). 0 mismatches, 0 failures; .gitattributes is Hugging Face's own.",
+    "run": "scripts/verify_store.py --repo asrinna118/hivemind-cells --download-all, Colab, the owner's session, 2026-11-27 ~21:32 PT, exit 0",
+    "result_file": {
+     "path": "HiveMIND recovery \u2014 2026-11-26/Store-verify-results-20261128-0532/store-verify.json (Google Drive)",
+     "bytes": 10373,
+     "sha256": "1f35cedfc6c665778cf769869c29bcd44c2f6caa836ea37a57c22a0994efe8c6",
+     "copy": "docs/r1/store-verify.json"
+    },
+    "run_output": "Store-verify-results-20261128-0532/store-verify-run-output.txt"
+   },
+   "superseded": {
+    "proven_by_hash": 51,
+    "of": 86,
+    "note": "the earlier 51/86 from a hand-copied listing (docs/r1/store-listing-check.tsv); kept as the record of what that listing could prove"
+   }
+  }
+ }
 }

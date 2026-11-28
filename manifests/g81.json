@@ -1,13 +1,69 @@
 {
  "generation": "g81",
  "role": "the body the loop resumes from (docs/RESUME-G81.md)",
- "record": {"easy": [32, 32], "hard": [23, 32], "all": [55, 64], "talk": 8.2, "gate_seeds": "20000811-20000818", "source": "docs/reads/g81.md"},
+ "record": {
+  "easy": [
+   32,
+   32
+  ],
+  "hard": [
+   23,
+   32
+  ],
+  "all": [
+   55,
+   64
+  ],
+  "talk": 8.2,
+  "gate_seeds": "20000811-20000818",
+  "source": "docs/reads/g81.md"
+ },
  "eval_bridge": {
-  "easy_v1_loose": {"passed": 32, "of": 32, "source": "g81 record (docs/reads/g81.md), registry-verified"},
+  "easy_v1_loose": {
+   "passed": 32,
+   "of": 32,
+   "source": "g81 record (docs/reads/g81.md), registry-verified"
+  },
   "easy_v2_strict": null,
   "per_kind": null,
   "eval_v2_floor": null,
   "decision": "pending: strict re-sit of g81 on its gate seeds (RESUME-G81 R6a), then scripts/rebaseline.py",
   "rule": "Gemini ruling 2026-11-28: delta = 32 - easy_v2_strict; 0 -> floor 30/32; 1-2 -> 30 - delta with recovery targets; 3+ -> STOP, back to the manager"
+ },
+ "r1": {
+  "run": "2026-11-28, Colab, R1-results-20261128-031438 in the Drive recovery folder; evidence copied to docs/r1/",
+  "files": "84 of 84 extracted and verified against the archive map's SHA-256 (13 archives)",
+  "cells_rebuilt": {
+   "g39code": "valid (gate PASS)",
+   "g44words2": "valid (gate PASS)"
+  },
+  "rows_audited": {
+   "rows": 20000,
+   "note": "the release kept only the newest 20,000 rows (training/grow_record.MOST_ROWS): older rows are not in this dataset and were not audited",
+   "web_rows": 1091,
+   "flagged_rows": 14,
+   "incidents": [
+    {
+     "seed": 10003306,
+     "kind": "a fact found on the open web",
+     "rows": "1068-1075 (8)",
+     "members": 2,
+     "why": "109 numbers in each answer: the Codex audit's g34 incident; its count of 7 rows (1068-1074) missed line 1075, the second member's pair row"
+    },
+    {
+     "seed": 30004256,
+     "kind": "a fact found on the open web",
+     "rows": "2706-2711 (6)",
+     "members": 2,
+     "why": "answer is a page or JSON dump: a second incident, not in the Codex audit"
+    }
+   ],
+   "incidence_by_kind": "a fact found on the open web 4 of 163 answers (2.45%: 2 tasks x 2 members); every other web kind 0",
+   "walk_a_site_rows": {
+    "g38": 12,
+    "all_gens": 65
+   }
+  },
+  "upload": "uploaded 2026-11-27 20:06 PT, owner-approved: private repo asrinna118/hivemind-cells, 86 files (~3.3 GB), one commit per group (g39: 2, g44: 2, g73: 27, g80: 27, g81: 27, shared: 1), one file of each commit read back and SHA-256 matched, every staged file listed; results R1-results-20261128-035957 in the Drive recovery folder (docs/r1/r1-report-upload.json)"
  }
 }

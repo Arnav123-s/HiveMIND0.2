@@ -1,0 +1,84 @@
+{
+ "g81code": {
+  "ok": true,
+  "missing": [],
+  "extra": [],
+  "max_rel_error_matrix": 0.0004554070474114269,
+  "max_rel_error_edit": 0.00030054739909246564,
+  "config": {
+   "peft_type": "LORA",
+   "task_type": "CAUSAL_LM",
+   "r": 16,
+   "lora_alpha": 32.0,
+   "lora_dropout": 0.0,
+   "target_modules": [
+    "down_proj",
+    "gate_proj",
+    "k_proj",
+    "o_proj",
+    "q_proj",
+    "up_proj",
+    "v_proj"
+   ],
+   "layers_to_transform": [
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35
+   ],
+   "bias": "none",
+   "rebuilt_from_gguf": true
+  }
+ },
+ "g80words": {
+  "ok": true,
+  "missing": [],
+  "extra": [],
+  "max_rel_error_matrix": 0.00046763825230300426,
+  "max_rel_error_edit": 0.0002974965318571776,
+  "config": {
+   "peft_type": "LORA",
+   "task_type": "CAUSAL_LM",
+   "r": 16,
+   "lora_alpha": 32.0,
+   "lora_dropout": 0.0,
+   "target_modules": [
+    "down_proj",
+    "gate_proj",
+    "k_proj",
+    "o_proj",
+    "q_proj",
+    "up_proj",
+    "v_proj"
+   ],
+   "layers_to_transform": [
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35
+   ],
+   "bias": "none",
+   "rebuilt_from_gguf": true
+  }
+ }
+}
