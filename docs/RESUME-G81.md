@@ -245,36 +245,30 @@ easy slice:
   "87th_file": ".gitattributes (Hugging Face's own; confirmed in the keeper's listing)",
   "results": "R1-results-20261128-035957",
   "verification": {
-   "proven_by_hash": 51,
-   "of": 86,
-   "how": "the keeper's API listing (LFS oid = SHA-256 of the bytes) compared with the extract-time SHA-256 in manifests/r1-files.json, file by file (docs/r1/store-listing-check.tsv); the R1 read-back's 6 files are among the 51",
-   "unproven": {
-    "listing_mis_copied": {
-     "count": 6,
-     "files": [
-      "g80/t80.g80data.safetensors",
-      "g80/t80.g80words2.safetensors",
-      "g80/t80.g80data.gguf",
-      "g73/t80.g73data2.safetensors",
-      "g80/t80.g80data2.gguf",
-      "g81/t80.g81sources2.gguf"
-     ],
-     "why": "two listed hashes differ from the record by one character, four are not 64 hex characters; sizes all match. Most likely copying errors in the listing, not in the store: unproven either way"
+   "final": {
+    "proven": 86,
+    "of": 86,
+    "verdict": "ALL PROVEN",
+    "hf_own": 1,
+    "by": {
+     "downloaded_and_hashed": 84,
+     "rebuilt_byte_identical": 2
     },
-    "json_sidecars": {
-     "count": 27,
-     "why": "the listing gives git blob ids (SHA-1), not comparable with the recorded SHA-256; all 27 sizes match"
+    "detail": "every stored file downloaded and its SHA-256 computed locally, equal to the extract-time SHA-256 in manifests/r1-files.json (84 files, closing the 6 unreadable listing entries and the 27 sidecars); g39/t80.g39code.safetensors and g44/t80.g44words2.safetensors rebuilt from the store's proven .gguf with identical bytes (2 files). 0 mismatches, 0 failures; .gitattributes is Hugging Face's own.",
+    "run": "scripts/verify_store.py --repo asrinna118/hivemind-cells --download-all, Colab, the owner's session, 2026-11-27 ~21:32 PT, exit 0",
+    "result_file": {
+     "path": "HiveMIND recovery \u2014 2026-11-26/Store-verify-results-20261128-0532/store-verify.json (Google Drive)",
+     "bytes": 10373,
+     "sha256": "1f35cedfc6c665778cf769869c29bcd44c2f6caa836ea37a57c22a0994efe8c6",
+     "copy": "docs/r1/store-verify.json"
     },
-    "rebuilt_adapters": {
-     "count": 2,
-     "files": [
-      "g39/t80.g39code.safetensors",
-      "g44/t80.g44words2.safetensors"
-     ],
-     "why": "made in R1, not extracted: no hash of them was recorded anywhere (r1-report.json, validation.json, docs/r1/ hold none); sizes 67,921,440 B equal the real cells'"
-    }
+    "run_output": "Store-verify-results-20261128-0532/store-verify-run-output.txt"
    },
-   "closing_step": "python3 scripts/verify_store.py --repo asrinna118/hivemind-cells (needs HF_TOKEN): reads the listing from the API itself, downloads and hashes the 27 sidecars, rebuilds the two adapters from the store's proven .gguf (byte-deterministic) and compares; --download-all also hashes every LFS file locally. Not yet run."
+   "superseded": {
+    "proven_by_hash": 51,
+    "of": 86,
+    "note": "the earlier 51/86 from a hand-copied listing (docs/r1/store-listing-check.tsv); kept as the record of what that listing could prove"
+   }
   }
  }
 }
@@ -405,18 +399,18 @@ copied to `docs/r1/`.
     g44 2, g73 27, g80 27, g81 27, shared 1.
   - Private, per the keeper's check of the Hugging Face API. The 87th listed file is Hugging Face's own
     `.gitattributes`.
-  - **Verification coverage: 51 of 86 files proven by hash.** The method: each SHA-256 (LFS oid) in the keeper's API
-    listing was compared with the extract-time SHA-256 in `manifests/r1-files.json`, file by file
-    (`docs/r1/store-listing-check.tsv`). The upload's read-back of 6 files is included in the 51.
-  - **35 files are not proven:**
-    - **6 have listing hashes that can't be read.** Two differ from the record by one character, and four are not 64
-      hex characters. All sizes match, so these are most likely copying errors in the listing, not in the store, but
-      they are unproven either way. The six are `g80data.safetensors`, `g80words2.safetensors`, `g80data.gguf`,
-      `g73data2.safetensors`, `g80data2.gguf` and `g81sources2.gguf`.
-    - **27 `.json` sidecars:** the listing gives git blob ids, not SHA-256. All 27 sizes match.
-    - **The 2 rebuilt adapters** (`g39code`, `g44words2` `.safetensors`): no hash was ever recorded for them.
-  - **To close all 35:** run `scripts/verify_store.py` with the token. It reads the listing from the API itself (no
-    copying), downloads and hashes the sidecars, and rebuilds the two adapters from the store's proven `.gguf`. The
-    rebuild is byte-deterministic (tested), so identical bytes prove them. Not yet run.
+  - **Verification coverage: 86 of 86 files proven ("ALL PROVEN").** The run:
+    `scripts/verify_store.py --repo asrinna118/hivemind-cells --download-all`, in Colab in the owner's session,
+    2026-11-27 ~21:32 PT, exit 0.
+    - **84 files** were downloaded and hashed locally, and each SHA-256 equals the extract-time SHA-256 in
+      `manifests/r1-files.json`. This closes the 6 listing entries that couldn't be read and the 27 sidecars.
+    - **2 files**, the rebuilt `g39code` and `g44words2` `.safetensors`, were rebuilt from the store's proven
+      `.gguf` with identical bytes.
+    - 0 mismatches, 0 failures. `.gitattributes` is Hugging Face's own file.
+  - **Result file:** `store-verify.json` (10,373 B, SHA-256 `1f35cedf…efe8c6`), in the Drive recovery folder under
+    `Store-verify-results-20261128-0532/`, with `store-verify-run-output.txt`. A copy is at
+    `docs/r1/store-verify.json`.
+  - The earlier figure, 51 of 86, came from a hand-copied listing (`docs/r1/store-listing-check.tsv`) and is
+    superseded.
 - **R2 waits** for the manager's go-ahead.
 
