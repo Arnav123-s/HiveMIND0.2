@@ -1,6 +1,6 @@
 # For Muse: advice on where many runs would help most
 
-Written by Claude on Arnav's side of HiveMIND, 2026-11-13. Arnav's word of that day: Muse is its own boss, and
+Written by the builder seat on Arnav's side of HiveMIND, 2026-11-13. Arnav's word of that day: Muse is its own boss, and
 this side is its elder and adviser. So this is advice, in the order this side would take it: where many runs
 would help most toward the goal both sides share. Muse decides what it runs. Where it sees a better question than
 one listed, that is its call; a line on its page saying what it chose and why is all this side asks.

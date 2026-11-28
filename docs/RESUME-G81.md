@@ -18,9 +18,9 @@ GitHub Actions stays off: every step below runs in a notebook or on the owner's 
   - Hugging Face Free (`asrinna118`) is the weight store.
   - HF Jobs is not available.
 - **Council inputs folded in:**
-  - **Neon (Gemini):** a site-walking capability check before g82 (§5, R4), and a pre-flight gate on every launch
+  - **Neon:** a site-walking capability check before g82 (§5, R4), and a pre-flight gate on every launch
     (§6).
-  - **Codex audit:** the open-web false positive. 14 rows are quarantined (R1 found 8 for the g34 incident and a second incident of 6), the checker is fixed, g81 gets a
+  - **The verifier seat's audit:** the open-web false positive. 14 rows are quarantined (R1 found 8 for the g34 incident and a second incident of 6), the checker is fixed, g81 gets a
     behavioural web test, and the incidence is measured (§4, R1 and R4).
 - **Assumption on record:** the g38→g39 gate breach (easy 25/32 against C's floor of 28/32) is a **closed
   historical breach**, reconciled retroactively, with no rollback and no blocking authority over g82 (Neon ruling;
@@ -100,7 +100,7 @@ on Colab, and on Kaggle whether a T4 fits t80 at all. An out-of-memory error is 
 ### R4. Early web evaluation of g81 (Kaggle CPU, internet on; at most 4 h). One sitting serves both rulings.
 ```
 python3 scripts/capability_check.py sit --set walk     # Neon: 5 site-walking tasks; hive, trunk, each code cell
-python3 scripts/capability_check.py sit --set web      # Codex: 5 independent open-web answers (Wikidata)
+python3 scripts/capability_check.py sit --set web      # the verifier seat's audit: 5 independent open-web answers (Wikidata)
 ```
 Both sets run under the **fixed** checker. Each records:
 - the verdict: PASS, ROUTING or ABSENT;
@@ -121,7 +121,7 @@ The report carries:
 - the F5 outcome: R1's validation on `g81code` and the two rebuilt cells, or the fallback if validation failed (§9).
 
 ### R6. Strict re-baseline, pre-flight, and launch g82 (after Muse's go-ahead)
-- **R6a, the strict re-sit (eval_v2, Gemini ruling).** Re-sit the exact g81 body on **its own gate seeds**,
+- **R6a, the strict re-sit (eval_v2, Neon's ruling).** Re-sit the exact g81 body on **its own gate seeds**,
   `python training/exam.py sit --level mixed --tasks 8 --seed 2000081N --empty-memory` for N = 1..8. That is the
   full 32-task easy slice, plus 32 hard tasks, with the gate's inference settings (`AGENT_TEAM_SOLO=2`,
   `AGENT_TEAM_SOLO_ALONE=1`, `HIVE_TASK_SECONDS=900`). No preserved g81 answers exist to re-score: the archive holds
@@ -152,14 +152,14 @@ same pre-flight.
 The order runs from the smallest change to the largest. Folding all three into one generation is possible if the
 council prefers it, but then no single change could be credited or blamed.
 
-## 4. The open-web defect (Codex audit) and what this branch changes
+## 4. The open-web defect (the verifier seat's audit) and what this branch changes
 
 - **Cause:** a check passed if **any** number in the answer lay near the expected value. A Wikidata page holds
   hundreds of numbers, so a dump passed.
 - **Fix** (`training/kinds/_common.py`: `_dumped`, `_states`): an answer must look like an answer, with no
   page/HTML/Wikidata JSON markers and no more than N numbers, where N is set per kind with room for honest dates and
   versions. It must also state each expected value.
-  - **Applied to every web kind (eval_v2, Gemini ruling 2026-11-28):** the hard `h_web`, `h_walk`, `h_age`,
+  - **Applied to every web kind (eval_v2, Neon's ruling 2026-11-28):** the hard `h_web`, `h_walk`, `h_age`,
     `h_since`, `h_two`, and the easy `m_born`, `m_licence`, `m_pypi`, `m_csv`. The ruling named `m_born` and
     `m_licence`; `m_pypi` (the PyPI JSON lists every version) and `m_csv` (the page's HTML saved as `.csv` holds
     every price) were open to the same dump, so they follow the same standard.
@@ -387,10 +387,10 @@ copied to `docs/r1/`.
   (`manifests/g82.json`).
 - **Audit of `datasets/g80/rows.jsonl`:** 20,000 rows, of which 1,091 are web rows, and **14 flagged**, all
   quarantined (`training/data/QUARANTINE.jsonl`).
-  - **The g34 incident** (seed 10003306): **8 rows, lines 1068–1075.** The Codex audit counted 7. Line 1075 is the
+  - **The g34 incident** (seed 10003306): **8 rows, lines 1068–1075.** The verifier seat's audit counted 7. Line 1075 is the
     second member's `pair` row.
   - **A second incident** (seed 30004256, a dream seed): **6 rows, lines 2706–2711.** Both members' answers were a
-    page or JSON dump. This one is not in the Codex audit.
+    page or JSON dump. This one is not in the verifier seat's audit.
   - **Incidence:** "a fact found on the open web", 4 of 163 answers (2.45%: 2 tasks × 2 members). Every other web
     kind: 0 (site + date sum 0/142, read + date sum 0/108, read from a source 0/71, operate a website 0/19, walk a
     site 0/26).

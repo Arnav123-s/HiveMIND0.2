@@ -28,7 +28,7 @@
   "per_kind": null,
   "eval_v2_floor": null,
   "decision": "pending: strict re-sit of g81 on its gate seeds (RESUME-G81 R6a), then scripts/rebaseline.py",
-  "rule": "Gemini ruling 2026-11-28: delta = 32 - easy_v2_strict; 0 -> floor 30/32; 1-2 -> 30 - delta with recovery targets; 3+ -> STOP, back to the manager"
+  "rule": "Neon's ruling 2026-11-28: delta = 32 - easy_v2_strict; 0 -> floor 30/32; 1-2 -> 30 - delta with recovery targets; 3+ -> STOP, back to the manager"
  },
  "r1": {
   "run": "2026-11-28, Colab, R1-results-20261128-031438 in the Drive recovery folder; evidence copied to docs/r1/",
@@ -48,14 +48,14 @@
      "kind": "a fact found on the open web",
      "rows": "1068-1075 (8)",
      "members": 2,
-     "why": "109 numbers in each answer: the Codex audit's g34 incident; its count of 7 rows (1068-1074) missed line 1075, the second member's pair row"
+     "why": "109 numbers in each answer: the g34 incident of the verifier seat's audit; its count of 7 rows (1068-1074) missed line 1075, the second member's pair row"
     },
     {
      "seed": 30004256,
      "kind": "a fact found on the open web",
      "rows": "2706-2711 (6)",
      "members": 2,
-     "why": "answer is a page or JSON dump: a second incident, not in the Codex audit"
+     "why": "answer is a page or JSON dump: a second incident, not in the verifier seat's audit"
     }
    ],
    "incidence_by_kind": "a fact found on the open web 4 of 163 answers (2.45%: 2 tasks x 2 members); every other web kind 0",

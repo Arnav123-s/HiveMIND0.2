@@ -72,7 +72,7 @@ def check(manifest, results=None):
            "at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"), "checks": [], "waivers_used": []}
     waivers = {w.get("check"): w for w in manifest.get("waivers") or [] if w.get("by") and w.get("reason")}
 
-    # 0. under eval_v2 the floor is final only once the strict re-baseline has run (Gemini ruling, 2026-11-28)
+    # 0. under eval_v2 the floor is final only once the strict re-baseline has run (Neon's ruling, 2026-11-28)
     if manifest.get("eval") == "v2":
         bpath = ROOT / manifest.get("bridge", "manifests/g81.json")
         try:

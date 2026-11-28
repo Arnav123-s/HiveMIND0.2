@@ -31,7 +31,7 @@ bash scripts/resume.sh grow
 
 `exam` (needs the full setup) and `ask "a task"` are the other commands; `stop` stops what it started.
 
-## 3. The first message to the new session (Fable 5.2)
+## 3. The first message to the new session
 
 Use section 1 of `BITNET_MISSION.md` (on main). It hands over the whole goal with full freedom and tells the new
 session how to set up this fresh machine. (The older first message that stood here, written on 2026-11-11, is

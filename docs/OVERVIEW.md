@@ -56,7 +56,7 @@ trunk → **paired gate** → record.
 - **Engrams** (per-cell memory edits), a shared hive engram, and notes are built but **off**.
   - Measured on t17, the apparent gain (16/18 against 6/18) came from the short orders, not from memory.
   - The t80 body already uses the short orders.
-- **Kept methods** (PR 105, the Codex side): the programming tool saves several verified programs per task, picks
+- **Kept methods** (PR 105, the researcher side): the programming tool saves several verified programs per task, picks
   the one that fits the request's examples, names the bill when they disagree, and can repair one integer
   arithmetic mistake.
   - Invoices: 3/6 → 6/6.
@@ -90,7 +90,7 @@ trunk → **paired gate** → record.
 | 11-15 | t80 arrived: g24 and g27 kept |
 | 11-16 | **The key finding:** each kind was passed always or never, because cells were taught only what they already passed |
 | 11-17 | Lessons rebuilt: study until learned, lessons kept back, rows that fit, a memory guard, the paired gate, reads by the record job. **g41: 58/64, the best so far** |
-| 11-18 | Kinds one per file. 24 new hard kinds (from g44, so hard scores before and after are not comparable). The talk exam. **Five generations with nobody's hand** (g42 to g45, g47). The drift audit; the strict gate. The CPU rule lab and the checked deliveries (Codex side). Chat from saved methods. g48 running |
+| 11-18 | Kinds one per file. 24 new hard kinds (from g44, so hard scores before and after are not comparable). The talk exam. **Five generations with nobody's hand** (g42 to g45, g47). The drift audit; the strict gate. The CPU rule lab and the checked deliveries (researcher side). Chat from saved methods. g48 running |
 
 In all: 613 commits on main, 107 pull requests, 920 tests.
 
@@ -99,7 +99,7 @@ In all: 613 commits on main, 107 pull requests, 920 tests.
 - **The line runs itself.** Each generation is judged, recorded, read, drawn and followed by the next.
 - **Fixes are found by cause** from the members' real programs and proven by replaying them (g45: 3 of 4 lost file
   tasks right on replay).
-- **Proof before every merge.** Two sides (this loop and the Codex side) build on each other's branches without
+- **Proof before every merge.** Two sides (this loop and the researcher side) build on each other's branches without
   redoing work.
 
 ## What went wrong, and the lesson

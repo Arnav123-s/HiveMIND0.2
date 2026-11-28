@@ -18,7 +18,7 @@ only (the GitHub MCP tools are retired). Older handoffs: `docs/history/`.
 |---|---|---|
 | g71, with pairs | run 45196041785, started 14:36 UTC 23 Nov, training at 15:40 | record about 19:45. Nobody holds the loop: E handed over, no wake is set |
 | Stage 1B trial, `--pull 0.1` | ready (PRs 146, 152, 156) | at g71's record: cancel g72 before its train jobs, then `gh api -X POST repos/arnav123-s/hivemind/actions/workflows/grow.yml/dispatches -f ref=main -f 'inputs[versus]=--pull 0.1' -f 'inputs[pairs]=1'`; restart the line with `-f 'inputs[pairs]=1'` when it records. Judge per arm: delivered, member, not passed, held-out, regressions vs after |
-| The Codex side's PR 158 | open, reviewed read-only: not yet | general, off by default; no scored result (its exam runs failed the hardware check) |
+| The researcher side's PR 158 | open, reviewed read-only: not yet | general, off by default; no scored result (its exam runs failed the hardware check) |
 
 ## Open, in order
 
@@ -40,7 +40,7 @@ only (the GitHub MCP tools are retired). Older handoffs: `docs/history/`.
    (`scripts/selfreliance.one`): only lessons move it, not repairs. Compound tasks are solved part by part (PR 126).
 4. Board rows in `docs/PLAN.md`: Y1, A1, G1, C1 (lru rows still over 508 pieces), J1, D1, P1, W2, R3, M2, T3.
 
-## Codex side (other agent, same account)
+## Researcher side (other agent, same account)
 
 Judged, not taken into the line: PR 122 (a one-kind answer key), 131 (merged anyway from the owner's account;
 checked: inert by default, tests pass), 135 and 136 (their own numbers show no held-out gain: 2/30 and 4/30 against

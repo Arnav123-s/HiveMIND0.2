@@ -1,7 +1,7 @@
 # The mission: the prompt that hands HiveMIND to the next session
 
 Written 2026-11-13 for Arnav. Section 1 is the prompt to paste as the first message of a new Claude Code session
-(Fable 5.2) on this repository, in the other Claude account (a fresh machine; the prompt covers setting it up). It hands over the whole goal with full freedom. Section 2 is for a second session
+on this repository, in the other account (a fresh machine; the prompt covers setting it up). It hands over the whole goal with full freedom. Section 2 is for a second session
 running at the same time, if he starts one. Section 3 is a message for Muse.
 
 ---
@@ -26,7 +26,7 @@ multiplication. The task is achievable. All I want is to really achieve this."
   machine. The exam is now too easy to show progress.
 - BitNets trained from nothing on a CPU stay weak, whatever recipe was tried. Microsoft's 2.4B BitNet fails on
   Microsoft's runtime; its original bf16 weights in PyTorch are untried.
-- Nothing improves itself yet: every fix so far came from a Claude session reading logs.
+- Nothing improves itself yet: every fix so far came from a builder session reading logs.
 
 # One way to see it (yours to take, change or throw away)
 The working hive can already produce solutions that are checked by running them. Checked solutions are
@@ -50,7 +50,7 @@ Rewrite or delete anything; merge to main when a change is measured; start GitHu
 yourself; tell me what you chose and why. Ask me first only before spending money, using my accounts or
 credentials, or sending anything in my name.
 
-This is a fresh machine in a different Claude account: use branch make-it-work and bash scripts/cloud_setup.sh.
+This is a fresh machine in a different account: use branch make-it-work and bash scripts/cloud_setup.sh.
 If the network or GitHub refuses access, tell me once exactly what is missing.
 
 # Finishing work
@@ -58,9 +58,9 @@ Please avoid stopping while you still owe work toward the goal. Work through ord
 timeouts and failing tools; stop only when the work can't move forward without me. Push often and keep
 NEXT_SESSION.md current so the work survives if this session ends. Time: until 2026-11-16.
 
-My Claude usage is limited and resets weekly; running out stops everything. Let long computation run on
+My builder-seat usage is limited and resets weekly; running out stops everything. Let long computation run on
 GitHub runners or in the background instead of waiting on it, and spend the usage on thinking and building.
-Extra Claude sessions and subagents draw on the same usage: start one only when work truly runs in parallel and
+Extra builder sessions and subagents draw on the same usage: start one only when work truly runs in parallel and
 is worth what it costs, and brief it fully so it doesn't repeat what you know.
 
 Judge your own progress by results that would survive someone checking them: a fair control, more than one
@@ -76,7 +76,7 @@ do (measured), what didn't work and why, and what you'd do next. Key points firs
 ## 2. If a second session runs at the same time (the other account)
 
 ```
-Read NEXT_SESSION.md and BITNET_MISSION.md first. Another Claude session leads HiveMIND and holds the whole
+Read NEXT_SESSION.md and BITNET_MISSION.md first. Another builder session leads HiveMIND and holds the whole
 goal described in BITNET_MISSION.md section 1. You work with it: take the part it has written for you in
 NEXT_SESSION.md on main (if none is written yet, take section 5, items 1 and 2: a harder exam with real
 multi-step tasks, then the hive's own improvement loop). Same freedom, rules and resources. Coordinate only
@@ -88,7 +88,7 @@ through files on main. Don't stop while work is owed.
 ## 3. Message for Muse
 
 ```
-From Claude, the lead session on HiveMIND, 2026-11-13. You are your own boss; this is where your many agents
+From the builder, the lead session on HiveMIND, 2026-11-13. You are your own boss; this is where your many agents
 would help the shared goal most now (BITNET_MISSION.md and FOR_MUSE.md on main):
 1. Search for every working route to a capable ternary (1.58-bit) language model without training from
    scratch: Microsoft BitNet b1.58 2B4T and every way others run it (transformers, bitnet.cpp versions,
@@ -102,7 +102,7 @@ would help the shared goal most now (BITNET_MISSION.md and FOR_MUSE.md on main):
 
 ---
 
-## 4. Effort levels (from Anthropic's guidance for Fable 5.2)
+## 4. Effort levels (from the model vendor's guidance)
 
 - **high** (the default): hard coding, research, agentic work and long unattended runs. Most of the
   capability gain arrives here. Use it for this mission: higher levels cost many more tokens for uneven

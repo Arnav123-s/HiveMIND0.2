@@ -211,7 +211,7 @@ def test_every_lean_exclusion_has_a_category_a_reason_and_names_a_real_test():
     assert not any("test_resume_tools" in t for t, _c, _w in items)  # this file is never on the list
 
 
-# --- the open-web checker (Codex audit: g34, h10003306_01, the Platte River, Wikidata Q655754) --------------------
+# --- the open-web checker (the verifier seat's audit: g34, h10003306_01, the Platte River, Wikidata Q655754) --------------------
 
 def _web_check(monkeypatch, values=(499.0,)):
     from training.kinds import h_web
@@ -352,7 +352,7 @@ def test_a_cell_survives_the_round_trip_through_its_f16_gguf(tmp_path):
     assert set(merge.load(tmp_path / "rebuilt.safetensors")) == set(merge.load(tmp_path / "real.safetensors"))  # the trunk reads it
 
 
-# --- eval_v2: one answer standard for every web kind, easy too (Gemini ruling on m_born / m_licence) --------------
+# --- eval_v2: one answer standard for every web kind, easy too (Neon's ruling on m_born / m_licence) --------------
 
 def test_the_easy_web_kinds_refuse_a_dump_and_take_an_answer(monkeypatch, tmp_path):
     import random
@@ -393,7 +393,7 @@ def test_the_easy_web_kinds_refuse_a_dump_and_take_an_answer(monkeypatch, tmp_pa
     assert not check(bad, "")[0]
 
 
-# --- eval_v2 re-baseline (Gemini ruling): both verdicts from one sitting, the floor by delta -----------------------
+# --- eval_v2 re-baseline (Neon's ruling): both verdicts from one sitting, the floor by delta -----------------------
 
 def test_a_web_check_records_both_verdicts_on_the_same_answer(monkeypatch):
     check = _web_check(monkeypatch)
