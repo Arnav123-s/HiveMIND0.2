@@ -170,6 +170,11 @@ council prefers it, but then no single change could be credited or blamed.
 - **Quarantine:** `training/quarantine.py` drops quarantined rows in **both** `grow.py gather` and `train`. A row is
   identified by the same key `once()` uses, so a copied or re-stamped row is caught too. The archive is never
   changed: the rows stay on Drive as evidence.
+  **It fails closed** (since the audit of 2026-11-28). In `gather` and `train`, a missing quarantine file, an empty
+  one, or any entry whose `sha256` is not 64 lowercase hex characters raises `QuarantineError`, and nothing is
+  trained or written. Only the two tools that write the file (`audit_web_rows.py --quarantine`, `r1_run.py`) may
+  start from a missing or empty file; a malformed entry stops them too. With the valid 14-key file the behaviour is
+  unchanged.
 - **Comparability:** every web kind now scores under a stricter check than g81's own gate did. The easy floor is
   re-based on the strict re-sit (R6b), and the bridge in `manifests/g81.json` keeps both scores side by side. Hard web
   counts from g82 on compare with R6a's strict hard score, not with g81's recorded 23/32.
@@ -412,5 +417,13 @@ copied to `docs/r1/`.
     `docs/r1/store-verify.json`.
   - The earlier figure, 51 of 86, came from a hand-copied listing (`docs/r1/store-listing-check.tsv`) and is
     superseded.
+- **Fixes from the independent audit (2026-11-28)**, which confirmed the 14 keys and the 86/86 result:
+  - **The quarantine now fails closed** (§4). Before, a missing file, an empty one or a mistyped digest let every
+    row through silently.
+  - **`scripts/verify_store.py` pins one store revision** for the listing and every download, fetches each file
+    once, and re-hashes the fetched source `.gguf` against its manifest SHA-256 before rebuilding an adapter.
+    Before, the rebuild's second, unpinned fetch could, in principle, have proven an adapter against a `.gguf` that
+    changed between reads. The audit showed this in simulation only, not in our run. The 86/86 result stands; a
+    re-run under the fixed script would also record the revision.
 - **R2 waits** for the manager's go-ahead.
 

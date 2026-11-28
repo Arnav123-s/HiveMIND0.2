@@ -14,6 +14,7 @@ of the same kind (seed 30004256, lines 2706-2711, a page or JSON dump). All 14 k
 """
 import hashlib
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -25,22 +26,46 @@ def key(row):
                                      sort_keys=True).encode()).hexdigest()
 
 
-def keys(path=None):
+class QuarantineError(RuntimeError):
+    """The quarantine cannot be trusted: training must stop rather than train on rows it may have let through."""
+
+
+HEX64 = re.compile(r"[0-9a-f]{64}")
+
+
+def keys(path=None, *, building=False):
+    """The set of quarantined row keys. FAILS CLOSED (audit of 2026-11-28): a missing file, an empty one, or any entry
+    whose sha256 is not 64 lowercase hex characters raises QuarantineError, so a training set is never built from a
+    quarantine that silently filters nothing.
+
+    building=True is only for the tools that WRITE the file (scripts/audit_web_rows.py --quarantine, scripts/r1_run.py):
+    there a missing or empty file is the start, not a fault. A malformed entry raises there too."""
     path = Path(path or FILE)  # looked up at the call, not when the module loads
+    if not path.exists():
+        if building:
+            return set()
+        raise QuarantineError(f"quarantine file missing: {path} (training stops: it cannot leave out the audited rows)")
     out = set()
-    if path.exists():
-        for ln in path.read_text().splitlines():
-            ln = ln.strip()
-            if ln and not ln.startswith("#"):
-                out.add(json.loads(ln)["sha256"])
+    for n, ln in enumerate(path.read_text().splitlines(), 1):
+        ln = ln.strip()
+        if not ln or ln.startswith("#"):
+            continue
+        try:
+            digest = json.loads(ln)["sha256"]
+        except (ValueError, KeyError, TypeError) as e:
+            raise QuarantineError(f"{path}:{n}: not a JSON entry with a sha256 ({type(e).__name__})") from None
+        if not isinstance(digest, str) or not HEX64.fullmatch(digest):
+            raise QuarantineError(f"{path}:{n}: sha256 {digest!r} is not 64 lowercase hex characters")
+        out.add(digest)
+    if not out and not building:
+        raise QuarantineError(f"quarantine file has no entries: {path} (training stops: it cannot leave out the audited rows)")
     return out
 
 
 def drop(rows, path=None, log=print):
-    """ROWS without the quarantined ones (dicts or JSON lines, returned as given)."""
+    """ROWS without the quarantined ones (dicts or JSON lines, returned as given). Raises QuarantineError when the
+    quarantine is missing, empty or malformed (keys)."""
     bad = keys(path)
-    if not bad:
-        return rows
     kept = [r for r in rows if key(json.loads(r) if isinstance(r, str) else r) not in bad]
     if len(kept) != len(rows):
         log(f"quarantine: {len(rows) - len(kept)} row(s) left out (training/data/QUARANTINE.jsonl)")

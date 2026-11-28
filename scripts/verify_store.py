@@ -48,24 +48,35 @@ def expected():
     return {hf_store.path_in_store(f["store_name"]): f["sha256"] for a in spec["archives"].values() for f in a["files"]}
 
 
-def listing(api, repo):
-    """{path: {"size", "lfs_sha256" or None}} from the API."""
+def listing(api, repo, revision):
+    """{path: {"size", "lfs_sha256" or None}} from the API, at REVISION."""
     from huggingface_hub.hf_api import RepoFile
     out = {}
-    for e in api.list_repo_tree(repo, repo_type="model", recursive=True, expand=True):
+    for e in api.list_repo_tree(repo, repo_type="model", recursive=True, expand=True, revision=revision):
         if isinstance(e, RepoFile):  # folders are skipped
             out[e.path] = {"size": e.size, "lfs_sha256": e.lfs.sha256 if e.lfs is not None else None}  # BlobLfsInfo.sha256: the oid
     return out
 
 
 def verify(api, repo, download, download_all=False, rebuild=None):
-    """{path: (status, detail)} for every stored and every expected file, and the overall verdict."""
-    want, got = expected(), listing(api, repo)
+    """(ok, {path: (status, detail)}, revision) for every stored and every expected file.
+
+    ONE revision of the store is resolved at the start, and the listing and every download are made at it, so the
+    store changing while the run reads it cannot mix two versions (audit of 2026-11-28). Each file is fetched once.
+    Before an adapter is rebuilt, its fetched source .gguf is hashed again and must equal its manifest SHA-256: the
+    proof never rests on bytes that were not themselves checked."""
+    revision = api.repo_info(repo, repo_type="model").sha
+    if not revision:
+        raise SystemExit("verify_store: the store's revision could not be resolved: no proof without a pinned revision")
+    want, got = expected(), listing(api, repo, revision)
     res = {}
     tmp = Path(tempfile.mkdtemp(prefix="store-verify-"))
+    fetched = {}
 
     def fetch(p):
-        return Path(download(repo_id=repo, filename=p, repo_type="model", local_dir=str(tmp)))
+        if p not in fetched:
+            fetched[p] = Path(download(repo_id=repo, filename=p, repo_type="model", local_dir=str(tmp), revision=revision))
+        return fetched[p]
 
     for p, w in sorted(want.items()):
         g = got.get(p)
@@ -85,15 +96,19 @@ def verify(api, repo, download, download_all=False, rebuild=None):
         if res.get(src, ("",))[0] != "PROVEN":
             res[p] = ("UNPROVEN", f"its source {src} is not proven")
             continue
+        source = fetch(src)
+        if sha(source) != want[src]:  # the bytes the rebuild reads, checked themselves, whatever proved src above
+            res[p] = ("MISMATCH", f"the fetched source {src} is not the manifest's (SHA-256 {sha(source)} != {want[src]})")
+            continue
         out = tmp / "rebuild" / Path(p).name
-        (rebuild or _rebuild)(fetch(src), out)
+        (rebuild or _rebuild)(source, out)
         stored = g["lfs_sha256"] if (g["lfs_sha256"] and not download_all) else sha(fetch(p))
         h = sha(out)
         res[p] = ("PROVEN", "rebuilt from the proven .gguf: identical bytes") if h == stored else ("MISMATCH", f"rebuild {h} != stored {stored}")
     for p in sorted(set(got) - set(want) - set(REBUILT)):
         res[p] = ("HF_OWN", "Hugging Face's own file") if p in HF_OWN else ("UNEXPECTED", "stored, but in no record")
     ok = all(s in ("PROVEN", "HF_OWN") for s, _ in res.values())
-    return ok, res
+    return ok, res, revision
 
 
 def _rebuild(gguf, out):
@@ -111,14 +126,14 @@ def main(argv):
         return 2
     from huggingface_hub import HfApi, hf_hub_download
     api = HfApi(token=os.environ.get("HF_TOKEN"))
-    ok, res = verify(api, opts["--repo"], lambda **kw: hf_hub_download(token=os.environ.get("HF_TOKEN"), **kw), "--download-all" in argv)
+    ok, res, revision = verify(api, opts["--repo"], lambda **kw: hf_hub_download(token=os.environ.get("HF_TOKEN"), **kw), "--download-all" in argv)
     counts = {}
     for s, _ in res.values():
         counts[s] = counts.get(s, 0) + 1
-    rec = {"repo": opts["--repo"], "verdict": "ALL PROVEN" if ok else "NOT ALL PROVEN", "counts": counts,
+    rec = {"repo": opts["--repo"], "revision": revision, "verdict": "ALL PROVEN" if ok else "NOT ALL PROVEN", "counts": counts,
            "download_all": "--download-all" in argv, "files": {p: {"status": s, "detail": d} for p, (s, d) in res.items()}}
     Path(opts.get("--out", "store-verify.json")).write_text(json.dumps(rec, indent=1))
-    print(json.dumps({k: rec[k] for k in ("repo", "verdict", "counts")}, indent=1))
+    print(json.dumps({k: rec[k] for k in ("repo", "revision", "verdict", "counts")}, indent=1))
     for p, (s, d) in res.items():
         if s not in ("PROVEN", "HF_OWN"):
             print(f"  {s}: {p}: {d}")
