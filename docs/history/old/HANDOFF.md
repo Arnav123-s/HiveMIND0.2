@@ -286,8 +286,8 @@ small fallback models: never compare across that line. Seeds 315 and 9001-9012 h
 **His standing word** (blocks below, verbatim): the codebase is mine; I am the biggest boss and reach the goal;
 Muse (other agent, branch hivemind_muse) is its own boss with the manpower, I advise it (FOR_MUSE.md); his ideas
 are side work, never goals; no pointless repetition; be usage-aware; don't stop while work is owed; merges are
-mine once measured. Still asked first: spending money, his credentials, sending anything in his name. Fable 5.2
-is available to him until 2026-11-16; this account's usage resets Sunday 2026-11-15; a second account is unused.
+mine once measured. Still asked first: spending money, his credentials, sending anything in his name. The lead builder
+session is available to him until 2026-11-16; this account's usage resets Sunday 2026-11-15; a second account is unused.
 
 **How faults are found (the only method that has worked):** read the members' own programs and outputs, never the
 score. Every members sitting uploads them (artifact `the-members-own-work`: TASK.md, REPORT.md, member*_*.py,
@@ -375,7 +375,7 @@ no longer runs wide sweeps of ideas itself.
 "muse side as i said any other aget ecpet claude agents are my ideas, ideas are not goals they are simply ideas i
 think might or might not help to reach goal , u may or may not use them that decgion is yours to make"
 
-My reading: what Muse or any other non-Claude agent writes, posts or opens as a PR is an idea to weigh, never an
+My reading: what Muse or any other non-builder agent writes, posts or opens as a PR is an idea to weigh, never an
 order and never a goal. Whether to use it is decided here, by what is measured.
 
 ### 2026-11-12, night: what the members' own logs showed, his ideas at 20 minutes, the 2.4B BitNet answers (newest)
@@ -405,7 +405,7 @@ order and never a goal. Whether to use it is decided here, by what is measured.
 
 ## START HERE: moving to a new account (paused 2026-11-11, 20:00 UTC)
 
-Arnav paused the work and is continuing from a different Claude account. The old cloud machine is gone; only what
+Arnav paused the work and is continuing from a different account. The old cloud machine is gone; only what
 is on GitHub survives. A new session should read this block, then "Live status" below, then README.md.
 
 **What survives and where**

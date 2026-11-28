@@ -2,7 +2,7 @@
 
     python3 scripts/audit_web_rows.py ROWS.jsonl [--out runs/audit/web-rows.tsv] [--quarantine]
 
-The confirmed incident (Codex audit, 2026-11-28): g34, task h10003306_01, the Platte River (Wikidata Q655754). Two
+The confirmed incident (the verifier seat's audit, 2026-11-28): g34, task h10003306_01, the Platte River (Wikidata Q655754). Two
 members answered with a dump of Wikidata's page; the old check took ANY number of the text near the value as the
 answer, so both were marked DONE, and rows of datasets/g80/rows.jsonl teach that program: the audit counted 7 (lines
 1068-1074); R1 found 8 (1068-1075) and a second incident (2706-2711): docs/r1/.

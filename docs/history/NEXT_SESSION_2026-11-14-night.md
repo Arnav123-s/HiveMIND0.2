@@ -1,4 +1,4 @@
-# NEXT SESSION: HiveMIND, handed to Fable 5.2
+# NEXT SESSION: HiveMIND, handed to the lead builder session
 
 Written 2026-11-14, 21:10 UTC. This page replaces every earlier handoff. The old ones are in `docs/history/`
 for detail only: where they set rules (gates, keeping a body only when it scores higher, strength records,

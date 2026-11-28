@@ -4,8 +4,8 @@ For the BitNet mission and the prompts that start each session, see `BITNET_MISS
 in HANDOFF.md, is stricter than that prompt, the prompt wins**: older rules were written for earlier sessions and
 many no longer hold. Read the rules here as background, not as limits.
 
-Written 2026-11-13, 17:00 UTC, at the end of a long session (Fable 5.2, then Opus 5.5 at the very end), for the
-next Claude session on HiveMIND. It is self-contained: after reading it you know the goal, who is who, the rules,
+Written 2026-11-13, 17:00 UTC, at the end of a long session (builder sessions), for the
+next builder session on HiveMIND. It is self-contained: after reading it you know the goal, who is who, the rules,
 what was measured, how to work here, and exactly what to do next. Longer history: `HANDOFF.md` (newest blocks
 first). Setting up a fresh cloud environment: `NEW_SESSION.md`.
 
@@ -196,7 +196,7 @@ Two hives live in the repo:
   into main yourself once a change is measured**. Don't stop while work is owed; be usage-aware; no pointless
   repetition (no status notes on routine notifications, no re-wording rounds).
 - **Still ask him first:** spending money, using his credentials, sending anything in his name.
-- **Muse**: another agent (non-Claude), branch `hivemind_muse`, "its own boss" with lots of manpower (it can spawn
+- **Muse**: another agent (not the builder), branch `hivemind_muse`, "its own boss" with lots of manpower (it can spawn
   many agents) but a weak machine: 1.5 shared CPUs, **no llama engine** (so it cannot run meaningful hive
   sittings). You are its **elder and adviser**: `FOR_MUSE.md` on main is your advice (questions in priority order,
   the form results must come back in: `edit-lab/for-hive/<question>.md`). Read its pages; rerun a claimed win
@@ -206,7 +206,7 @@ Two hives live in the repo:
 - Honesty: held-out seeds are run once on frozen code; claims only from seeds nobody has read. **Seeds 315 and
   9001-9012 have been read: use them to find faults only.** Next fresh seeds: 9013 upward (or any unused).
 - No model names in commits or PR bodies. CPU only. Under 10 GB RAM for the hive.
-- Time: Fable 5.2 is available to him until **2026-11-16** on two accounts; this account's usage resets Sunday
+- Time: the lead builder session is available to him until **2026-11-16** on two accounts; this account's usage resets Sunday
   2026-11-15; a second account has full usage.
 
 ## 3. Where it stands (measured)

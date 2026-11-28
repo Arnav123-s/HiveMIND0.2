@@ -38,7 +38,7 @@ sys.path.insert(0, str(ROOT))
 
 # fixed seeds: the same tasks in every arm and on every re-run
 SETS = {"walk": ("h_walk", [f"capcheck-h_walk-{i}" for i in range(5)]),   # Neon: the g38 site-walking question
-        "web": ("h_web", [f"capcheck-h_web-{i}" for i in range(5)])}      # Codex: independent web answers (the g34 defect)
+        "web": ("h_web", [f"capcheck-h_web-{i}" for i in range(5)])}      # the verifier seat's audit: independent web answers (the g34 defect)
 SEEDS = SETS["walk"][1]
 CODE_CELLS = ("g81code", "g81code2", "g80code", "g80code2", "g39code")
 

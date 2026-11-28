@@ -1,7 +1,7 @@
-# NEXT SESSION: the handoff to the next Claude session on HiveMIND
+# NEXT SESSION: the handoff to the next builder session on HiveMIND
 
-Written 2026-11-14 at 17:40 UTC by a Claude session that did the bookkeeping, measurement and repair work, for a
-Fable 5.2 session that does the hard research. The earlier handoff, with the full history of 2026-11-13 and
+Written 2026-11-14 at 17:40 UTC by a builder session that did the bookkeeping, measurement and repair work, for a
+lead builder session that does the hard research. The earlier handoff, with the full history of 2026-11-13 and
 2026-11-14, is kept unchanged in `docs/history/NEXT_SESSION_2026-11-14.md`. Read it only when you need a detail;
 where it disagrees with this page, this page is newer.
 
@@ -249,7 +249,7 @@ wrong one for the same task. Practice records these pairs from 2026-11-14 evenin
   (where programs run), `training/grow.py` (practice, training rows, training a cell), `training/grow_record.py`
   (the gate decides; it writes `cells/body.json`), `training/exam.py` and `training/exam_hard.py` (the exam;
   `HELD_OUT` lists the four never-practised kinds), `.github/workflows/grow.yml` (the nightly loop and trials).
-- **Muse** is another agent (not Claude) on branch `hivemind_muse` with many workers but a weak machine. Your
+- **Muse** is another agent (not the builder) on branch `hivemind_muse` with many workers but a weak machine. Your
   advice to it is `FOR_MUSE.md`. Treat its results as ideas to re-measure.
 
 ## For Arnav: the prompt to start the next session

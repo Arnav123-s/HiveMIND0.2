@@ -51,7 +51,7 @@ def _says(body, x, tol=0.006):
 
 
 # ---- the open-web answer check (resume 2026-11-28) --------------------------------------------------------------------
-# Defect (Codex audit of the preserved data): in g34, task h10003306_01 (the Platte River, Wikidata Q655754), two
+# Defect (the verifier seat's audit of the preserved data): in g34, task h10003306_01 (the Platte River, Wikidata Q655754), two
 # members answered with a dump of Wikidata's page and were marked right, because the check took ANY number of the text
 # within tolerance as the answer. Seven rows of datasets/g80/rows.jsonl teach that program. A page dump holds hundreds
 # of numbers, so one of them is near almost any value. An answer must now LOOK like an answer: no dump of a page or of

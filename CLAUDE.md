@@ -1,11 +1,11 @@
-# HiveMIND: Claude's loop rules
+# HiveMIND: the builder's loop rules
 
 @AGENTS.md
 
 `AGENTS.md` (above) is the shared source of truth: what HiveMIND is, the five bars, the generation, the repo map and
-how agents share the work. This page adds only what a Claude session does as loop holder or worker.
+how agents share the work. This page adds only what a builder session does as loop holder or worker.
 
-## Claude Code Loop Holder Rules
+## Builder Loop Holder Rules
 - Start every session with `python scripts/cycle.py` and `python scripts/agents_log.py --board`.
 - Claim the loop in `docs/AGENTS.md` (`holds the loop`) when acting as Loop Holder; use `claude -w <name>` worktrees and `/clear` between unrelated tasks.
 - Enforce non-negotiable rules (no force-push to `main`, full `pytest` before merge) via hooks/settings rather than prompt reminders.

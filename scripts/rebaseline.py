@@ -1,4 +1,4 @@
-"""Re-baseline the easy floor from a strict re-sit of g81 (Gemini ruling on m_born / m_licence, 2026-11-28).
+"""Re-baseline the easy floor from a strict re-sit of g81 (Neon's ruling on m_born / m_licence, 2026-11-28).
 
     python3 scripts/rebaseline.py --results DIR [--results DIR ...] [--bridge manifests/g81.json] [--manifest manifests/g82.json]
 
@@ -100,7 +100,7 @@ def rebaseline(results):
         entry.update(decision="STOP", why=f"delta {delta}: a capability finding, back to the manager before any floor is lowered")
         return entry, None
     entry.update(decision=decision, recovery_targets=targets,
-                 eval_v2_floor={"min": floor, "of": RECORDED_LOOSE[1], "basis": f"Gemini ruling: 30 - delta ({delta}); strict re-sit {v2}/{n}"})
+                 eval_v2_floor={"min": floor, "of": RECORDED_LOOSE[1], "basis": f"Neon's ruling: 30 - delta ({delta}); strict re-sit {v2}/{n}"})
     return entry, entry["eval_v2_floor"]
 
 

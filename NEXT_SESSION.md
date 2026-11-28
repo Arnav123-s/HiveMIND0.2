@@ -29,7 +29,7 @@ dispatch, cancel and `rerun-failed-jobs` work. Previous handoff: `docs/history/N
   2. **Then** `versus='--orpo'` with `pairs=1`.
   3. Then trials for PR 188 (niche lineage; needs `cells/niche.json` written by the record first) and PR 186 (birth
      donor / sibling repulsion; needs `grow.yml` artifact wiring for `--donor` / `--sibling` first). PR 187 parked.
-- **The Codex side is building three core organism PRs in parallel, no file overlap:** `training/lineage.py` niche
+- **The researcher side is building three core organism PRs in parallel, no file overlap:** `training/lineage.py` niche
   survival / apoptosis; `training/grow.py` + `training/merge.py` PR VII-1 cross-organ borrowing + twin repulsion;
   `training/hive_engram.py` + `team/ternary.py` NP-LoRA one-mind stacking + Self-Canary sleep fold. Review each
   read-only, merge flag-off, and trial one per generation.
@@ -66,12 +66,12 @@ dispatch, cancel and `rerun-failed-jobs` work. Previous handoff: `docs/history/N
 
 1. **Judge the ORPO trial g84, restart the line; time each speed switch alone** (above).
 2. **Astra's PR 163** (`HIVE_QUORUM_K`): reviewed 25 Nov, **parked, flag off**: 42.9% time saved but wrong deliveries 0 -> 3 (held out 0 -> 2) on 12 matched g73 tasks.
-3. **Codex speedup PRs** (reviewed 25 Nov): PR 170 Phase 0 prefix unload merged **off** (`HIVE_UNLOAD_PREFIX=0`;
+3. **Researcher-side speedup PRs** (reviewed 25 Nov): PR 170 Phase 0 prefix unload merged **off** (`HIVE_UNLOAD_PREFIX=0`;
    bit-identical, 4.63 GiB freed; a real slice needs 25.3 GiB disk, so trial it only after a disk check). PR 167
    vocab-outer CCE parked for a trial after g80 (needs `HIVE_CHUNK_CE` set in a versus run). PR 171 merged off since (see 4). Do not flip a training default until `--pull 0.1` is read at g79-g80.
 4. **Queued trials:** see "Trial order" above (Leap 1 speed stack, then ORPO, then PRs 188 and 186). **PR 173** (IX-1 relay to a disputed third seat) **parked, flag off**: tied stock 5/9 vs 5/9
    on g73, 0 new wins, 0 Seat 3/4 rescues.
-5. **The Codex side's PR 158**: final, **parked in draft, flag off**: 17 of 19 runtime property-plan calls timed out
+5. **The researcher side's PR 158**: final, **parked in draft, flag off**: 17 of 19 runtime property-plan calls timed out
    at 25 s -> 0 usable plans; held out 0 of 10; wrong 17->9 only by withholding 16->25; correct 5->4. Property checks
    move offline into `niche_dream` (Research Part IV).
 6. **D's four single-change branches**, one trial each, never together: `claude/blissful-mccarthy-32ekqy-chunk`

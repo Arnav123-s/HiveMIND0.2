@@ -28,8 +28,8 @@ HiveMIND is ONE self-improving digital organism on one frozen 1.58-bit ternary D
 - `training/ternary_base.py` & `docs/KERNELS.md`: `ternary_base._C` C dequant; `ik_llama.cpp` hits `27.6 tok/s` cliff at 4 streams vs `76.5` at 3 streams.
 
 ## 4. Division of Labor
-- **Claude Code (Loop Holder & `main` Integrator):** Owns `main` health, `grow.yml` switches, loop tracking (`scripts/cycle.py`, `docs/AGENTS.md`, `NEXT_SESSION.md`), read-only review of Astra's PRs, and clean merges.
-- **Astra (Codex — Lead ML Scientist):** Works in isolated `git worktree` branches off `main` building one tight, single-variable PR at a time against `docs/TRUE_ARCHITECTURE.md`. Never create giant `+50k LOC` folders under `training/experiments/`.
+- **The builder (Loop Holder & `main` Integrator):** Owns `main` health, `grow.yml` switches, loop tracking (`scripts/cycle.py`, `docs/AGENTS.md`, `NEXT_SESSION.md`), read-only review of Astra's PRs, and clean merges.
+- **Astra (the researcher — Lead ML Scientist):** Works in isolated `git worktree` branches off `main` building one tight, single-variable PR at a time against `docs/TRUE_ARCHITECTURE.md`. Never create giant `+50k LOC` folders under `training/experiments/`.
 
 ## 5. Empirical Kills Ledger (Never Repeat These)
 - CPU speculative decoding (PR #122: slower, `23–37s` vs `13–18s`).
@@ -96,9 +96,9 @@ hold the loop. A trial run shares the same 20 runners and stalls the line: only 
 
 ### How agents share the work (git is the only channel)
 
-- **The loop holder (one at a time, Claude):** owns `main` stability, `grow.yml` switches, judges each generation,
+- **The loop holder (one at a time, the builder):** owns `main` stability, `grow.yml` switches, judges each generation,
   reviews other agents' PRs read-only, merges. Claims with a "holds the loop" line in `docs/AGENTS.md`.
-- **Astra (the Codex side) and other workers:** build tight, single-variable experiment PRs in their own branches.
+- **Astra (the researcher side) and other workers:** build tight, single-variable experiment PRs in their own branches.
   One variable per PR, its proof in numbers, an off switch, nothing on the generation path by default until the loop
   holder takes it. Large binaries and experiment data stay out of `main`.
 - **Claim before work:** a log line `- <UTC time> <letter>: claim <id>. <proof>` in `docs/AGENTS.md`; the earlier

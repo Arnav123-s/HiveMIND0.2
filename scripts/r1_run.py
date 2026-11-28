@@ -39,7 +39,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 FILES = ROOT / "manifests" / "r1-files.json"
-INCIDENT = range(1068, 1075)  # datasets/g80/rows.jsonl lines 1068-1074 (Codex audit)
+INCIDENT = range(1068, 1075)  # datasets/g80/rows.jsonl lines 1068-1074 (the verifier seat's audit)
 VALIDATE = ("g81code", "g80words")  # two cells that have both files, of two organs
 REBUILD = ("g39code", "g44words2")
 STEPS = ("restore", "extract", "validate", "audit", "upload", "report")
