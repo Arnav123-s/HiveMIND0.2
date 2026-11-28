@@ -1,8 +1,8 @@
 # Resuming the loop from g81 on the new compute
 
 **Status:** working runbook, accepted by the manager 2026-11-28 (easy floor 30/32 accepted; eval_v2 ruled for every
-web kind). **R1 ran on 2026-11-28 up to its pause (no upload): gate PASS, audit done (§11).** Nothing has trained,
-and nothing has run on Kaggle. The upload is the owner's decision. **No long run
+web kind). **R1 is done (2026-11-28): gate PASS, audit done, store populated (`asrinna118/hivemind-cells`, private;
+§11).** Nothing has trained, and nothing has run on Kaggle. R2 waits for the manager's go-ahead. **No long run
 starts before the report-back point (step R5).** Owner: the council (manager Muse). Policy: `docs/REPO-POLICY.md`.
 GitHub Actions stays off: every step below runs in a notebook or on the owner's machine.
 
@@ -219,7 +219,7 @@ easy slice:
   "HIVE_STORE=hf",
   "eval_v2: one answer standard for every web kind (5 hard + 4 easy)",
   "training/data/QUARANTINE.jsonl: 14 rows from R1's audit (committed)",
-  "g39code/g44words2 .safetensors rebuilt from .gguf (R1 gate PASS); in the store once the owner uploads"
+  "g39code/g44words2 .safetensors rebuilt from .gguf (R1 gate PASS), in the store"
  ],
  "waivers": [],
  "override": null,
@@ -234,7 +234,15 @@ easy slice:
    "g44words2"
   ],
   "basis": "R1 gate PASS (docs/r1/r1-report.json): t80.g81code and t80.g80words rebuilt from their .gguf matched their real .safetensors (max relative error 4.55e-4 / 4.68e-4 per matrix, 3.01e-4 / 2.97e-4 on B.A; limit 2e-3; no missing or extra tensors). Manager ruling on F5: rebuild, gated on this validation.",
-  "store_status": "rebuilt .safetensors staged in the R1 session; upload into the store is the owner's decision (notebook upload cell), not yet run"
+  "store_status": "in the store: uploaded 2026-11-27 20:06 PT, owner-approved: private repo asrinna118/hivemind-cells, 86 files (~3.3 GB), one commit per group (g39: 2, g44: 2, g73: 27, g80: 27, g81: 27, shared: 1), one file of each commit read back and SHA-256 matched, every staged file listed; results R1-results-20261128-035957 in the Drive recovery folder (docs/r1/r1-report-upload.json)"
+ },
+ "store": {
+  "repo": "asrinna118/hivemind-cells",
+  "private": true,
+  "files_uploaded": 86,
+  "store_listing": 87,
+  "note": "the 87th listed file is most likely Hugging Face's own .gitattributes (unverified from here)",
+  "results": "R1-results-20261128-035957"
  }
 }
 ```
@@ -329,7 +337,7 @@ The last two differ only in bookkeeping. Either way, no future trunk could conta
 | `m_translate`, `m_summary` | keyword substrings (`m_summary` must also be one sentence) | little to some |
 | `m_follow`, `m_steps`, `_programs` | exact form, structured parts, hidden tests | strict |
 
-## 11. R1 results (2026-11-28, run to its pause; upload not run)
+## 11. R1 results (2026-11-28; upload done by the owner)
 
 Run by the manager with the owner in Colab. Results: `R1-results-20261128-031438` in the Drive recovery folder,
 copied to `docs/r1/`.
@@ -358,5 +366,11 @@ copied to `docs/r1/`.
     the backup and could not be audited. The incidence holds for the newest 20,000 rows only.
 - **F10:** 12 rows of "walk a site over several pages" from g38 survive (65 across g34–g74). They are training
   rows, not g38code2's weights.
-- **Not run:** the upload (the owner's decision), so the store is still empty and R2 waits.
+- **Upload: done** (owner-approved, 2026-11-27 20:06 PT; results `R1-results-20261128-035957`, copied as
+  `docs/r1/r1-report-upload.json`).
+  - The private repo `asrinna118/hivemind-cells` holds **86 files (~3.3 GB)**, one commit per group: g39 2,
+    g44 2, g73 27, g80 27, g81 27, shared 1.
+  - One file of each commit was read back and its SHA-256 matched, and every staged file is listed.
+  - The store lists 87 files. The extra one is most likely Hugging Face's own `.gitattributes` (unverified).
+- **R2 waits** for the manager's go-ahead.
 

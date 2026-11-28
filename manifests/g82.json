@@ -14,7 +14,7 @@
   "HIVE_STORE=hf",
   "eval_v2: one answer standard for every web kind (5 hard + 4 easy)",
   "training/data/QUARANTINE.jsonl: 14 rows from R1's audit (committed)",
-  "g39code/g44words2 .safetensors rebuilt from .gguf (R1 gate PASS); in the store once the owner uploads"
+  "g39code/g44words2 .safetensors rebuilt from .gguf (R1 gate PASS), in the store"
  ],
  "waivers": [],
  "override": null,
@@ -29,6 +29,14 @@
    "g44words2"
   ],
   "basis": "R1 gate PASS (docs/r1/r1-report.json): t80.g81code and t80.g80words rebuilt from their .gguf matched their real .safetensors (max relative error 4.55e-4 / 4.68e-4 per matrix, 3.01e-4 / 2.97e-4 on B.A; limit 2e-3; no missing or extra tensors). Manager ruling on F5: rebuild, gated on this validation.",
-  "store_status": "rebuilt .safetensors staged in the R1 session; upload into the store is the owner's decision (notebook upload cell), not yet run"
+  "store_status": "in the store: uploaded 2026-11-27 20:06 PT, owner-approved: private repo asrinna118/hivemind-cells, 86 files (~3.3 GB), one commit per group (g39: 2, g44: 2, g73: 27, g80: 27, g81: 27, shared: 1), one file of each commit read back and SHA-256 matched, every staged file listed; results R1-results-20261128-035957 in the Drive recovery folder (docs/r1/r1-report-upload.json)"
+ },
+ "store": {
+  "repo": "asrinna118/hivemind-cells",
+  "private": true,
+  "files_uploaded": 86,
+  "store_listing": 87,
+  "note": "the 87th listed file is most likely Hugging Face's own .gitattributes (unverified from here)",
+  "results": "R1-results-20261128-035957"
  }
 }
