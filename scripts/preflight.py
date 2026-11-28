@@ -28,6 +28,8 @@ import json
 import sys
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parent.parent
+
 
 def exam_results(dirs):
     out = []
@@ -69,6 +71,17 @@ def check(manifest, results=None):
     rec = {"generation": manifest.get("generation"), "grows_from": manifest.get("grows_from"),
            "at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"), "checks": [], "waivers_used": []}
     waivers = {w.get("check"): w for w in manifest.get("waivers") or [] if w.get("by") and w.get("reason")}
+
+    # 0. under eval_v2 the floor is final only once the strict re-baseline has run (Gemini ruling, 2026-11-28)
+    if manifest.get("eval") == "v2":
+        bpath = ROOT / manifest.get("bridge", "manifests/g81.json")
+        try:
+            decision = (json.loads(bpath.read_text()).get("eval_bridge") or {}).get("decision", "")
+        except (OSError, ValueError):
+            decision = ""
+        ok_b = decision in ("floor stays", "floor lowered by delta; recovery targets tagged")
+        rec["checks"].append({"check": "eval_v2_rebaseline", "ok": ok_b, "bridge": str(bpath.relative_to(ROOT)) if bpath.is_relative_to(ROOT) else str(bpath),
+                              "why": f"re-baselined: {decision}" if ok_b else f"no strict re-baseline yet ({decision or 'no bridge entry'}): run scripts/rebaseline.py"})
 
     # 1. the easy floor
     floor = manifest.get("easy_floor") or {}

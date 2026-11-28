@@ -6,7 +6,7 @@ its lesson writes the right program for a task of it (training/lessons.py teache
 import re
 
 from training import hive_bench as B
-from training.kinds._common import FIND_AUTHOR, _fill
+from training.kinds._common import FIND_AUTHOR, _fill, _v2
 
 KIND = "m_born"
 FAMILY = "websites"
@@ -29,8 +29,9 @@ def m_born(r):
         born = BeautifulSoup(B._get(f"https://quotes.toscrape.com/author/{AUTHORS[name]}/"), "html.parser").select_one(".author-born-date").text.strip()
         month, day, year = born.replace(",", "").split()
         body = B._body(report)
-        ok = year in body and str(int(day)) in body and month[:3].lower() in body.lower()
-        return ok, f"born {born}: in the answer {ok}"
+        # eval_v2: the author page dumped holds the date and much else (one standard for every web kind)
+        ok, tag = _v2(year in body and str(int(day)) in body and month[:3].lower() in body.lower(), body, 8, "m_born")
+        return ok, f"born {born}: in the answer {ok}{tag}"
     return "websites", "operate a website", f"Open quotes.toscrape.com, go to {name}'s author page and give me the date of birth.", check
 
 

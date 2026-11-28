@@ -309,3 +309,161 @@ def test_quarantined_rows_never_reach_a_training_set(tmp_path, monkeypatch):
     assert f.read_text().count("h10003306_01") == 6  # the evidence itself is untouched
     stamped = dict(rows[1], gen="g34")  # the key ignores the generation stamp, so a copied row is still caught
     assert quarantine.drop([stamped], path=q, log=lambda *a: None) == []
+
+
+# --- a lost .safetensors rebuilt from the cell's .gguf (g39code, g44words2: docs/RESUME-G81.md, F5) ---------------
+
+def test_a_cell_survives_the_round_trip_through_its_f16_gguf(tmp_path):
+    """The hive's own layout (ternary_base.Cell.save: float32, base_model.model.<module>, the last layers, all seven
+    projections), through the converter grow.py uses (--outtype f16), back through training/gguf_to_peft.py."""
+    import subprocess
+    import numpy as np
+    from safetensors.numpy import save_file
+    from training import gguf_to_peft, merge
+    base, cell = tmp_path / "base", tmp_path / "cell"
+    base.mkdir(); cell.mkdir()
+    (base / "config.json").write_text(json.dumps({"architectures": ["Qwen3ForCausalLM"], "model_type": "qwen3", "hidden_size": 64,
+        "intermediate_size": 192, "num_hidden_layers": 6, "num_attention_heads": 4, "num_key_value_heads": 2, "head_dim": 16,
+        "vocab_size": 256, "max_position_embeddings": 512, "rms_norm_eps": 1e-6, "rope_theta": 1e6, "tie_word_embeddings": False}))
+    rng, r = np.random.default_rng(7), 16
+    shapes = {"self_attn.q_proj": (64, 64), "self_attn.k_proj": (32, 64), "self_attn.v_proj": (32, 64), "self_attn.o_proj": (64, 64),
+              "mlp.gate_proj": (192, 64), "mlp.up_proj": (192, 64), "mlp.down_proj": (64, 192)}
+    t = {}
+    for layer in (4, 5):
+        for m, (o, i) in shapes.items():
+            t[f"base_model.model.model.layers.{layer}.{m}.lora_A.weight"] = (rng.standard_normal((r, i)) * 0.02).astype(np.float32)
+            t[f"base_model.model.model.layers.{layer}.{m}.lora_B.weight"] = (rng.standard_normal((o, r)) * 0.01).astype(np.float32)
+    save_file(t, str(cell / "adapter_model.safetensors"))
+    (cell / "adapter_config.json").write_text(json.dumps({"peft_type": "LORA", "task_type": "CAUSAL_LM", "r": r, "lora_alpha": 2 * r,
+        "target_modules": [m.split(".")[1] for m in shapes], "layers_to_transform": [4, 5], "base_model_name_or_path": str(base)}))
+    conv = ROOT / "training" / "llama_cpp_convert"
+    done = subprocess.run([sys.executable, str(conv / "convert_lora_to_gguf.py"), "--base", str(base), "--outfile", str(tmp_path / "c.gguf"),
+                           "--outtype", "f16", str(cell)], capture_output=True, text=True,
+                          env={**__import__("os").environ, "PYTHONPATH": f"{conv / 'gguf-py'}:{conv}"})
+    assert done.returncode == 0, done.stderr[-800:]
+    rebuilt, meta = gguf_to_peft.read(tmp_path / "c.gguf")
+    assert set(rebuilt) == set(t) and meta["adapter.lora.alpha"] == 32.0
+    cfg = gguf_to_peft.config(rebuilt, meta)
+    assert cfg["r"] == 16 and cfg["layers_to_transform"] == [4, 5] and len(cfg["target_modules"]) == 7
+    save_file(t, str(tmp_path / "real.safetensors"))
+    rep = gguf_to_peft.compare(rebuilt, tmp_path / "real.safetensors")
+    assert rep["ok"] and rep["max_rel_error_matrix"] < 1e-3 and rep["max_rel_error_edit"] < 1e-3  # float16 rounding, no more
+    save_file(rebuilt, str(tmp_path / "rebuilt.safetensors"))
+    assert set(merge.load(tmp_path / "rebuilt.safetensors")) == set(merge.load(tmp_path / "real.safetensors"))  # the trunk reads it
+
+
+# --- eval_v2: one answer standard for every web kind, easy too (Gemini ruling on m_born / m_licence) --------------
+
+def test_the_easy_web_kinds_refuse_a_dump_and_take_an_answer(monkeypatch, tmp_path):
+    import random
+    from training import hive_bench as B
+    from training.kinds import m_born, m_csv, m_licence, m_pypi
+    page = ('<html><body><div class="author-details"><span class="author-born-date">March 14, 1879</span> in Ulm '
+            + " ".join(f"<a href='/page/{i}'>{i}</a>" for i in range(30)) + "</div></body></html>")
+    monkeypatch.setattr(B, "_get", lambda url: page)
+    check = m_born.m_born(random.Random(0))[3]
+    assert check(None, "Born March 14, 1879.")[0]
+    assert not check(None, page)[0]
+
+    monkeypatch.setattr(B, "_hf", lambda model: {"cardData": {"license": "apache-2.0"}})
+    check = m_licence.m_licence(random.Random(0))[3]
+    assert check(None, "It is published under the Apache 2.0 licence (apache-2.0).")[0]
+    card = '{"cardData": {"license": "apache-2.0"}, "siblings": [' + ",".join(f'{{"rfilename": "model-{i}.safetensors"}}' for i in range(12)) + "]}"
+    assert not check(None, card)[0]
+
+    class Resp:
+        def json(self):
+            return {"info": {"version": "2.3.1"}}
+    import requests
+    monkeypatch.setattr(requests, "get", lambda *a, **k: Resp())
+    check = m_pypi.m_pypi(random.Random(0))[3]
+    assert check(None, "The current version is 2.3.1.")[0]
+    assert not check(None, "versions: " + ", ".join(f"2.{i}.{j}" for i in range(4) for j in range(3)) + ", 2.3.1")[0]
+
+    from bs4 import BeautifulSoup
+    listing = BeautifulSoup("".join(f'<article class="product_pod"><p class="price_color">£{10 + i}.50</p></article>' for i in range(5)), "html.parser")
+    monkeypatch.setattr(B, "_category", lambda cat: listing)
+    check = m_csv.m_csv(random.Random(0))[3]
+    good = tmp_path / "good"; (good / "work").mkdir(parents=True)
+    (good / "work" / "books.csv").write_text("title,price\n" + "".join(f"b{i},{10 + i}.50\n" for i in range(5)))
+    monkeypatch.setattr(B, "files", lambda run, ext: sorted((Path(run) / "work").glob("*" + ext)))
+    assert check(good, "")[0]
+    bad = tmp_path / "bad"; (bad / "work").mkdir(parents=True)
+    (bad / "work" / "books.csv").write_text(str(listing) + "<html>")
+    assert not check(bad, "")[0]
+
+
+# --- eval_v2 re-baseline (Gemini ruling): both verdicts from one sitting, the floor by delta -----------------------
+
+def test_a_web_check_records_both_verdicts_on_the_same_answer(monkeypatch):
+    check = _web_check(monkeypatch)
+    ok, why = check(None, WIKIDATA_DUMP)
+    assert not ok and "[eval_v1: pass; eval_v2: fail; kind: h_web]" in why  # the old check passed the dump
+    ok, why = check(None, "499 km")
+    assert ok and "[eval_v1: pass; eval_v2: pass; kind: h_web]" in why
+    ok, why = check(None, "1310 km")
+    assert not ok and "[eval_v1: fail; eval_v2: fail; kind: h_web]" in why
+
+
+def _resit(tmp_path, strict_failures, loose_failures=0, n=32):
+    """n easy tasks: the first `loose_failures` fail both ways, the next `strict_failures` are m_born dumps (v1 pass,
+    v2 fail), the rest pass both; plus 4 hard tasks that must not count."""
+    d = tmp_path / "resit"
+    for i in range(n):
+        if i < loose_failures:
+            tag, ok = "[eval_v1: fail; eval_v2: fail; kind: m_born]", False
+        elif i < loose_failures + strict_failures:
+            tag, ok = "[eval_v1: pass; eval_v2: fail; kind: m_born]", False
+        else:
+            tag, ok = ("[eval_v1: pass; eval_v2: pass; kind: m_born]" if i % 4 == 0 else ""), True
+        (d / f"e{i:02}").mkdir(parents=True)
+        (d / f"e{i:02}" / "exam.json").write_text(json.dumps({"id": f"e2000081{i % 8 + 1}_{i // 8:02}", "ok": ok, "why": "x " + tag}))
+    for i in range(4):
+        (d / f"h{i}").mkdir(parents=True)
+        (d / f"h{i}" / "exam.json").write_text(json.dumps({"id": f"h20000811_0{i}", "ok": False, "why": ""}))
+    return preflight.exam_results([d])
+
+
+def test_the_floor_follows_the_ruling_by_delta(tmp_path):
+    import rebaseline
+    e, floor = rebaseline.rebaseline(_resit(tmp_path / "a", 0))
+    assert e["delta"] == 0 and floor["min"] == 30 and e["recovery_targets"] == [] and e["decision"] == "floor stays"
+    e, floor = rebaseline.rebaseline(_resit(tmp_path / "b", 2))
+    assert e["delta"] == 2 and floor["min"] == 28 and len(e["recovery_targets"]) == 2
+    assert e["per_kind"]["m_born"]["v1"] - e["per_kind"]["m_born"]["v2"] == 2 and e["checker_effect"] == 2 and e["drift_new_compute"] == 0
+    e, floor = rebaseline.rebaseline(_resit(tmp_path / "c", 2, loose_failures=1))
+    assert e["decision"] == "STOP" and floor is None and e["drift_new_compute"] == 1 and e["checker_effect"] == 2
+    e, floor = rebaseline.rebaseline(_resit(tmp_path / "d", 0, n=31))
+    assert e["decision"] == "INVALID" and floor is None
+
+
+def test_rebaseline_writes_the_bridge_and_the_floor_and_preflight_then_clears_it(tmp_path, monkeypatch):
+    import rebaseline
+    bridge, manifest = tmp_path / "g81.json", tmp_path / "g82.json"
+    bridge.write_text((ROOT / "manifests" / "g81.json").read_text())
+    manifest.write_text((ROOT / "manifests" / "g82.json").read_text())
+    _resit(tmp_path, 1)
+    assert rebaseline.main(["--results", str(tmp_path / "resit"), "--bridge", str(bridge), "--manifest", str(manifest)]) == 0
+    b, m = json.loads(bridge.read_text())["eval_bridge"], json.loads(manifest.read_text())
+    assert b["easy_v1_loose"]["passed"] == 32 and b["easy_v2_strict"] == {"passed": 31, "of": 32, "source": b["easy_v2_strict"]["source"]}
+    assert b["eval_v2_floor"]["min"] == 29 and m["easy_floor"]["min"] == 29 and len(m["recovery_targets"]) == 1
+    m["bridge"] = str(bridge)  # an absolute path: ROOT / it is it
+    ok, rec = preflight.check(m, preflight.exam_results([tmp_path / "resit"]))
+    assert rec["checks"][0]["check"] == "eval_v2_rebaseline" and rec["checks"][0]["ok"]
+    assert ok  # 31 of 32 against a floor of 29
+
+
+def test_the_g82_manifest_blocks_until_the_rebaseline_has_run():
+    m = json.loads((ROOT / "manifests" / "g82.json").read_text())
+    ok, rec = preflight.check(m, None)
+    assert not ok and rec["checks"][0]["check"] == "eval_v2_rebaseline" and not rec["checks"][0]["ok"]
+
+
+def test_offline_easy_answers_that_enumerate_are_measured_not_scored(tmp_path):
+    import rebaseline
+    d = tmp_path / "x"
+    for tid, ans in (("e1_00", "It is a Tuesday."), ("e1_01", "Monday Tuesday Wednesday"), ("e1_02", " ".join(map(str, range(12)))), ("e1_03", "42")):
+        (d / tid).mkdir(parents=True)
+        (d / tid / "exam.json").write_text(json.dumps({"id": tid, "ok": True, "why": "", "answer": ans}))
+    got = {x["id"] for x in rebaseline.exposure(preflight.exam_results([d]))}
+    assert got == {"e1_01", "e1_02"}

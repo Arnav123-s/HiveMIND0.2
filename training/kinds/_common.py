@@ -70,19 +70,28 @@ def _dumped(body, most=MOST_NUMBERS):
     return ""
 
 
-def _states(body, values, tol, most=MOST_NUMBERS):
-    """(ok, why): BODY is answer-shaped (_dumped) and states every value in VALUES (each a number, or a list of numbers
-    any one of which is right), each within TOL (a number, or a function of the value)."""
-    why = _dumped(body, most)
-    if why:
-        return False, why
-    got = _nums(body)
+def _v2(loose_ok, text, most=MOST_NUMBERS, kind=""):
+    """(ok, tag) of a web check under eval_v2: the eval_v1 verdict (LOOSE_OK, the check as it was) AND an answer-shaped
+    TEXT. The tag records both verdicts in the check's reason, so one sitting yields both scores for the same answers
+    (scripts/rebaseline.py reads it): ' [eval_v1: pass; eval_v2: fail; kind: m_born]'."""
+    why = _dumped(text, most)
+    ok = bool(loose_ok) and not why
+    return ok, (f" ({why})" if why else "") + f" [eval_v1: {'pass' if loose_ok else 'fail'}; eval_v2: {'pass' if ok else 'fail'}; kind: {kind}]"
+
+
+def _states(body, values, tol, most=MOST_NUMBERS, kind=""):
+    """(ok, why): BODY states every value in VALUES (each a number, or a list of numbers any one of which is right),
+    each within TOL (a number, or a function of the value), and is answer-shaped (_dumped). WHY ends in the _v2 tag."""
+    got = _nums(body or "")
     tolf = tol if callable(tol) else (lambda v: tol)
+    loose, miss = True, ""
     for want in values:
         opts = want if isinstance(want, (list, tuple)) else [want]
         if not any(abs(g - v) <= tolf(v) for g in got for v in opts):
-            return False, f"no number of the answer is {', '.join(f'{v:g}' for v in opts[:6])}"
-    return True, ""
+            loose, miss = False, f"no number of the answer is {', '.join(f'{v:g}' for v in opts[:6])}"
+            break
+    ok, tag = _v2(loose, body, most, kind)
+    return ok, (miss + tag).strip()
 
 
 def _file(run, name):

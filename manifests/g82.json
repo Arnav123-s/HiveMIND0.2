@@ -1,0 +1,29 @@
+{
+ "generation": "g82",
+ "grows_from": "g81",
+ "dna": "t80",
+ "easy_floor": {
+  "min": 30,
+  "of": 32,
+  "basis": "accepted by the manager 2026-11-28 (g81 32/32 less the paired gate's 2-point margin); under eval_v2 it is final only once scripts/rebaseline.py has run"
+ },
+ "assumptions": [
+  "g38->g39 gate breach (easy 25/32 vs 28/32) closed: reconciled retroactively, no rollback, no blocking authority over g82 (Neon ruling)"
+ ],
+ "required_changes": [
+  "HIVE_STORE=hf",
+  "eval_v2: one answer standard for every web kind (5 hard + 4 easy)",
+  "training/data/QUARANTINE.jsonl filled by R1",
+  "g39code/g44words2 .safetensors rebuilt from .gguf (if ruled)"
+ ],
+ "trunk_leaves_missing": [
+  "g39code",
+  "g44words2"
+ ],
+ "waivers": [],
+ "override": null,
+ "dissent": [],
+ "eval": "v2",
+ "bridge": "manifests/g81.json",
+ "recovery_targets": []
+}

@@ -6,7 +6,7 @@ its lesson writes the right program for a task of it (training/lessons.py teache
 import re
 
 from training import hive_bench as B
-from training.kinds._common import _fill
+from training.kinds._common import _fill, _v2
 
 KIND = "m_licence"
 FAMILY = "live facts"
@@ -26,8 +26,11 @@ def m_licence(r):
     def check(run, report):
         lic = str((B._hf(model).get("cardData") or {}).get("license", "")).lower()
         words = re.findall(r"[a-z]+|\d+(?:\.\d+)?", lic)
-        body = B._body(report).lower()
-        return bool(words) and all(w in body for w in words), f"licence {lic} in the answer"
+        raw = B._body(report)
+        body = raw.lower()
+        # eval_v2: the model card dumped holds the licence's words among everything else
+        ok, tag = _v2(bool(words) and all(w in body for w in words), raw, 8, "m_licence")
+        return ok, f"licence {lic} in the answer: {ok}{tag}"
     return "live facts", "a fact read from a source", f"Under which licence is {model} published on Hugging Face?", check
 
 

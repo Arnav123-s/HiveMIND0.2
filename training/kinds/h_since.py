@@ -7,7 +7,7 @@ import datetime
 import re
 
 from training import hive_bench as B
-from training.kinds._common import PYPI, _dumped, _fill, _nums, _pypi, HARD_PACKAGES as PACKAGES
+from training.kinds._common import PYPI, _fill, _v2, _nums, _pypi, HARD_PACKAGES as PACKAGES
 
 KIND = "h_since"
 FAMILY = "hard: live facts"
@@ -24,9 +24,9 @@ def h_since(r):
         v, d = _pypi(pkg)
         days = (datetime.date.today() - datetime.date.fromisoformat(d)).days
         body = B._body(report)
-        why = _dumped(body, most=12)  # PyPI's JSON dumped holds every version and date: the right ones found by luck
-        ok = not why and v in body and any(abs(g - days) <= 1 for g in _nums(body))
-        return ok, f"{pkg} {v} of {d}, {days} days ago; version and days in the answer: {ok}" + (f" ({why})" if why else "")
+        # PyPI's JSON dumped holds every version and date: the right ones found by luck
+        ok, tag = _v2(v in body and any(abs(g - days) <= 1 for g in _nums(body)), body, 12, "h_since")
+        return ok, f"{pkg} {v} of {d}, {days} days ago; version and days in the answer: {ok}{tag}"
     return ("hard: live facts", "a fact read and a date sum on it", f"What is the latest version of {pkg} on PyPI, on which date was it released, "
             "and how many days ago was that?", check)
 
