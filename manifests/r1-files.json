@@ -1,0 +1,518 @@
+{
+ "about": "R1 (docs/RESUME-G81.md): the 13 archives of the Drive recovery folder that hold the g73/g80/g81 cells, the g80 rows and the two gguf-only cells; every file's SHA-256 from records/archive-map.tsv.gz (project-inventory.zip). scripts/r1_run.py reads this.",
+ "recovery_manifest_sha256": "7c29047ae015456b4820c12bde6248eba1d618263e784a50e564c94ed6f54084",
+ "restore_py_sha256": "bd089e35b07cecabd0f95249b66b0e1425a912e5d131b1b31272cb01e4f9606e",
+ "archives": {
+  "03-released-cells-and-rows-01.tar.zst": {
+   "bytes": 263087218,
+   "sha256": "826447be1f023546c86a2305f585c1c7dae589dd2658aac0d1726ed88273983d",
+   "parts": 4,
+   "files": [
+    {
+     "path": "models/g73/t80.g73code.gguf",
+     "sha256": "0474d8d5e9224ca5718ef765743b5fe83d492c817872ac731f07bbee7e58840e",
+     "store_name": "t80.g73code.gguf"
+    },
+    {
+     "path": "models/g73/t80.g73code2.gguf",
+     "sha256": "5e2f83d17ec19ba172e3e4931f7e5eb3b4eed447124ca99005ff9c50129758c2",
+     "store_name": "t80.g73code2.gguf"
+    },
+    {
+     "path": "models/g73/t80.g73data.gguf",
+     "sha256": "d325d6802ea46187604b036358acda19de7da25f7af4356edd2de24676edfff9",
+     "store_name": "t80.g73data.gguf"
+    },
+    {
+     "path": "models/g73/t80.g73data2.gguf",
+     "sha256": "52d89ff2382d7688a6aa6a70d080195e5a4c008099a12279df89afaa21fcb399",
+     "store_name": "t80.g73data2.gguf"
+    },
+    {
+     "path": "models/g73/t80.g73sources.gguf",
+     "sha256": "601a6bb15d76530e33438f20a6f1b2c9e085991cf99342a9678457b0c49d802a",
+     "store_name": "t80.g73sources.gguf"
+    },
+    {
+     "path": "models/g73/t80.g73sources2.gguf",
+     "sha256": "75379d1619519683bdf4a9c6b12de084c5cc1a74e044269dd2f728b66536ebb2",
+     "store_name": "t80.g73sources2.gguf"
+    },
+    {
+     "path": "models/g73/t80.g73trunk.gguf",
+     "sha256": "71facd902bb2d231bd5e126e4ef50313040a086d9867c37ddf68e1c59d53fbb0",
+     "store_name": "t80.g73trunk.gguf"
+    }
+   ]
+  },
+  "03-released-cells-and-rows-02.tar.zst": {
+   "bytes": 255123403,
+   "sha256": "f60be955ff8f2875b7e612dbe39ff6c1fc74aa70412610fbf0f62f020a93727b",
+   "parts": 4,
+   "files": [
+    {
+     "path": "models/g73/t80.g73code2.json",
+     "sha256": "52d60e20fd6b14fed27fb7187af8a32c30fce0e9446b4d469dda78257bed3d85",
+     "store_name": "t80.g73code2.json"
+    },
+    {
+     "path": "models/g73/t80.g73code2.safetensors",
+     "sha256": "122751cddc2ce9fbfdc9565fea5a31fa0345188335fee149725d97352f859b64",
+     "store_name": "t80.g73code2.safetensors"
+    },
+    {
+     "path": "models/g73/t80.g73data.json",
+     "sha256": "4d7f9847e425fc657d2b9ebd1e9ad1f4a5234f9ac334928353662ae4a0887780",
+     "store_name": "t80.g73data.json"
+    },
+    {
+     "path": "models/g73/t80.g73data2.json",
+     "sha256": "c82d83a3e14aa1de7cb7af7fe7414100d76ee3ea30bbb4008faed7e68e2edfdf",
+     "store_name": "t80.g73data2.json"
+    },
+    {
+     "path": "models/g73/t80.g73data2.safetensors",
+     "sha256": "ae484fc16b139c04cc803b34abb36413bb8f6f9f6e2960fa84f63d90af273d29",
+     "store_name": "t80.g73data2.safetensors"
+    },
+    {
+     "path": "models/g73/t80.g73sources.json",
+     "sha256": "7bfd993fe2214a317871a5f300998a71e4009489c75c92f9f6c17e08d45ccc4a",
+     "store_name": "t80.g73sources.json"
+    },
+    {
+     "path": "models/g73/t80.g73sources.safetensors",
+     "sha256": "959709cfb68f4bb5efce795f18c516d7e4afabe07be4ab3fdb1a82fee8623170",
+     "store_name": "t80.g73sources.safetensors"
+    },
+    {
+     "path": "models/g73/t80.g73sources2.json",
+     "sha256": "1319878be45ce018510ae1449bd753eabc2f0c91f97511c69419130ee31cc754",
+     "store_name": "t80.g73sources2.json"
+    },
+    {
+     "path": "models/g73/t80.g73words.gguf",
+     "sha256": "36a0d4bc8014ebe92081bb4dee64f5fe74ac2edca99d1c24fb68018299f70896",
+     "store_name": "t80.g73words.gguf"
+    },
+    {
+     "path": "models/g73/t80.g73words2.gguf",
+     "sha256": "dbf5a53d1c80e080124107276cfaf85d05596aafa89ec32c33dcbd0f850a95ef",
+     "store_name": "t80.g73words2.gguf"
+    }
+   ]
+  },
+  "03-released-cells-and-rows-03.tar.zst": {
+   "bytes": 252808454,
+   "sha256": "79bfee1f6942bdad9a90bf556555b552cf6e286256a878b6f17d525d4d10fa4d",
+   "parts": 4,
+   "files": [
+    {
+     "path": "models/g73/t80.g73sources2.safetensors",
+     "sha256": "94f6fa572699b11fbcd5e64829890ce09448fedc8a3c9f53272d69cca55b1641",
+     "store_name": "t80.g73sources2.safetensors"
+    },
+    {
+     "path": "models/g73/t80.g73trunk.json",
+     "sha256": "2b5a96cbaa4bf4108a805c63153badc02e7565b43dcceb0768ca3ed12e0a6d87",
+     "store_name": "t80.g73trunk.json"
+    },
+    {
+     "path": "models/g73/t80.g73trunk.safetensors",
+     "sha256": "7859f18d92ff5875a0234318fed80cfcc510c957390fd5099726df10464c555e",
+     "store_name": "t80.g73trunk.safetensors"
+    },
+    {
+     "path": "models/g73/t80.g73words.json",
+     "sha256": "4d27b609b6ceb37013b0df436befffef24e033422a78832ac92a2eea90c2f522",
+     "store_name": "t80.g73words.json"
+    },
+    {
+     "path": "models/g73/t80.g73words.safetensors",
+     "sha256": "75a339abbcba7874192ae065feb36995a5db13f1ab8c7378af67387cfba92c22",
+     "store_name": "t80.g73words.safetensors"
+    },
+    {
+     "path": "models/g73/t80.g73words2.json",
+     "sha256": "14fcafa4fa41da3506e1bada343324ae9349fbfff1cb26cae12287c528a76c0c",
+     "store_name": "t80.g73words2.json"
+    }
+   ]
+  },
+  "03-released-cells-and-rows-04.tar.zst": {
+   "bytes": 288060583,
+   "sha256": "8b71eec79b5dac7d4161b11c650bcfec37e69e620490d8514a52baa80d1df518",
+   "parts": 4,
+   "files": [
+    {
+     "path": "models/g73/t80.g73words2.safetensors",
+     "sha256": "4950343b35b09019cbdd4da190d945a71cbc6dc7ceb2441806dbf895b53198b6",
+     "store_name": "t80.g73words2.safetensors"
+    },
+    {
+     "path": "models/g80/t80.g80code.gguf",
+     "sha256": "1670ae186facd3674189f1a8999fa5f1d3249f7b4203295cb74a65f92cbf1825",
+     "store_name": "t80.g80code.gguf"
+    },
+    {
+     "path": "models/g80/t80.g80code.json",
+     "sha256": "2e68fec23b8337d917517908f22e588fed9efe801420a354492cce2b493e9536",
+     "store_name": "t80.g80code.json"
+    },
+    {
+     "path": "models/g80/t80.g80code.safetensors",
+     "sha256": "f5368c044f0bbc58f4026381f8f4901872527d8128fddb8669902ab8a1e4f840",
+     "store_name": "t80.g80code.safetensors"
+    },
+    {
+     "path": "models/g80/t80.g80code2.gguf",
+     "sha256": "b2b16dc57c9965008f0dc3215b69ff6586df424f1827714034e5e73eac481d26",
+     "store_name": "t80.g80code2.gguf"
+    },
+    {
+     "path": "models/g80/t80.g80code2.json",
+     "sha256": "47407f6c6714979827e5928132f4712347e0a03213c32fd6f3c389c09061db91",
+     "store_name": "t80.g80code2.json"
+    },
+    {
+     "path": "models/g80/t80.g80code2.safetensors",
+     "sha256": "323120cd2ab5d74253804607a8ac6c686070b3bb4f4369b82d27ddb15c42b983",
+     "store_name": "t80.g80code2.safetensors"
+    },
+    {
+     "path": "models/g80/t80.g80data.gguf",
+     "sha256": "db7859f6ae0e6f47300855feb54b27b48fd146c8d1323493dd57bea21acb5118",
+     "store_name": "t80.g80data.gguf"
+    },
+    {
+     "path": "models/g80/t80.g80data.json",
+     "sha256": "b0862fb9473ef79594af3fcf9aeadd25c4a893d692ca161956e37906ca05019e",
+     "store_name": "t80.g80data.json"
+    }
+   ]
+  },
+  "03-released-cells-and-rows-05.tar.zst": {
+   "bytes": 288074212,
+   "sha256": "c3283d21500db4c1002919d8976185268c65999059ecc4db1cd4f46026549e54",
+   "parts": 4,
+   "files": [
+    {
+     "path": "models/g80/t80.g80data.safetensors",
+     "sha256": "c1f3728dc7c965fc4c2953fe81a0db60844140cb11ef706c6c4b4c45609fd0e0",
+     "store_name": "t80.g80data.safetensors"
+    },
+    {
+     "path": "models/g80/t80.g80data2.gguf",
+     "sha256": "f214c3c9643b49fa48d3864a7a4070f7c5c18aca280a503a59c82a9b7a2b640f",
+     "store_name": "t80.g80data2.gguf"
+    },
+    {
+     "path": "models/g80/t80.g80data2.json",
+     "sha256": "64604f93fef862eb706881ebd92105ce18beef336f7d913dc0fba33812be2438",
+     "store_name": "t80.g80data2.json"
+    },
+    {
+     "path": "models/g80/t80.g80data2.safetensors",
+     "sha256": "2dd045809afe674cbd304e4d1575a93341b09462d2eb05c8c9720c0b09b69d01",
+     "store_name": "t80.g80data2.safetensors"
+    },
+    {
+     "path": "models/g80/t80.g80sources.gguf",
+     "sha256": "30341e222b4b659962567b4ff652cac620e979610b8b1abb10019a37e8cb6584",
+     "store_name": "t80.g80sources.gguf"
+    },
+    {
+     "path": "models/g80/t80.g80sources.json",
+     "sha256": "e16992c7663d4d6670cd0213b572757e93baf7735168855598996a1447d6122f",
+     "store_name": "t80.g80sources.json"
+    },
+    {
+     "path": "models/g80/t80.g80sources.safetensors",
+     "sha256": "39e8b24b0c80348f701151740412642b2371e9f326d4fca46ce84b6255f67a98",
+     "store_name": "t80.g80sources.safetensors"
+    },
+    {
+     "path": "models/g80/t80.g80sources2.gguf",
+     "sha256": "9ba4393200fee78863617b28fa2d4a11b59e78583adb90d6428d06c95b3fc2e3",
+     "store_name": "t80.g80sources2.gguf"
+    },
+    {
+     "path": "models/g80/t80.g80sources2.json",
+     "sha256": "a269e6d07902bc404dbb39a19c5285e97909763f0a1ce756270564f9ffcad768",
+     "store_name": "t80.g80sources2.json"
+    }
+   ]
+  },
+  "03-released-cells-and-rows-06.tar.zst": {
+   "bytes": 287726894,
+   "sha256": "3dcd1199f8c207d86a6e21e01159c9d6dd858beb55aec8635de4584873c9f992",
+   "parts": 4,
+   "files": [
+    {
+     "path": "models/g80/t80.g80sources2.safetensors",
+     "sha256": "3837f74c82716424c1152734f9a8a3bc66370a37cf1bdd4c8e774e398dbab24b",
+     "store_name": "t80.g80sources2.safetensors"
+    },
+    {
+     "path": "models/g80/t80.g80trunk.gguf",
+     "sha256": "5ff29232ac73781fb4b7a7699dc49d0878b86c8079067941f4b18669183b8f6d",
+     "store_name": "t80.g80trunk.gguf"
+    },
+    {
+     "path": "models/g80/t80.g80trunk.json",
+     "sha256": "9bd3f72c526f8d00fb317dd15754854626277a93d95faa28f0714c20909c2362",
+     "store_name": "t80.g80trunk.json"
+    },
+    {
+     "path": "models/g80/t80.g80trunk.safetensors",
+     "sha256": "20aa5a5e7df771436a067c68c7a0c1dae508cf159ba1a86be695e5ea8c572b42",
+     "store_name": "t80.g80trunk.safetensors"
+    },
+    {
+     "path": "models/g80/t80.g80words.gguf",
+     "sha256": "56eeee9e09e208f83684d7498751683e49a097050d2f0fb4b671870cfd2def5e",
+     "store_name": "t80.g80words.gguf"
+    },
+    {
+     "path": "models/g80/t80.g80words.json",
+     "sha256": "078031012a8059fcf4daebe70dd22ec3d03a8e91d577c2d5bb7a2c067cb3b1a1",
+     "store_name": "t80.g80words.json"
+    }
+   ]
+  },
+  "03-released-cells-and-rows-07.tar.zst": {
+   "bytes": 288072570,
+   "sha256": "2c0a58480fa258d28ce53bac0ea1aebae3f41e4409da0c9b3cf9b0a7a4ce11ee",
+   "parts": 4,
+   "files": [
+    {
+     "path": "models/g80/t80.g80words.safetensors",
+     "sha256": "8472bcf5b9dc22469b11f68f28caf592e838509bcf82229cf50eb7a741fe4a1c",
+     "store_name": "t80.g80words.safetensors"
+    },
+    {
+     "path": "models/g80/t80.g80words2.gguf",
+     "sha256": "df2b8ed9dfd170672ab637e7a0cdd24cc1e2f6b8517d7cfa782740161d2e13f7",
+     "store_name": "t80.g80words2.gguf"
+    },
+    {
+     "path": "models/g80/t80.g80words2.json",
+     "sha256": "010a679ad77f5ecf2e671fbc6e0ca72f89d9746556a30656d93a3fd78fc404f2",
+     "store_name": "t80.g80words2.json"
+    },
+    {
+     "path": "models/g80/t80.g80words2.safetensors",
+     "sha256": "5fdf87c8262743a88eb0c9c0dce83a14622334c907849c6aed0f96d4e3d19b79",
+     "store_name": "t80.g80words2.safetensors"
+    },
+    {
+     "path": "models/g81/t80.g81code.gguf",
+     "sha256": "21522c7a75bc71cb344c5905941e610d89b705dfa0c8ef760371746a08b9524b",
+     "store_name": "t80.g81code.gguf"
+    },
+    {
+     "path": "models/g81/t80.g81code.json",
+     "sha256": "68badc81dca4830ac3a6f90c5caf7c7c9e274838979597274165e8800c083dfe",
+     "store_name": "t80.g81code.json"
+    },
+    {
+     "path": "models/g81/t80.g81code.safetensors",
+     "sha256": "718256182dd142955b37276acf8113601cbb42420b3a3f939ee5737c0c3d56bd",
+     "store_name": "t80.g81code.safetensors"
+    },
+    {
+     "path": "models/g81/t80.g81code2.gguf",
+     "sha256": "e2c4ae9f89a6ad400585cda48451655fb6d662292436549f5bae4aa7124dc72d",
+     "store_name": "t80.g81code2.gguf"
+    },
+    {
+     "path": "models/g81/t80.g81code2.json",
+     "sha256": "e5c95317910b477da08669cd8128e6ea84e8f1a20bcee68acf18d601297f7c3c",
+     "store_name": "t80.g81code2.json"
+    }
+   ]
+  },
+  "03-released-cells-and-rows-08.tar.zst": {
+   "bytes": 288083237,
+   "sha256": "47e13eb385ba51111806d252f4d52cc76f591e66cb3928c145354f4b2d68038b",
+   "parts": 4,
+   "files": [
+    {
+     "path": "models/g81/t80.g81code2.safetensors",
+     "sha256": "421e70e7fd2db996efa145bc4d8d2aeac893a44ba974e1edfd071d274c15a8c3",
+     "store_name": "t80.g81code2.safetensors"
+    },
+    {
+     "path": "models/g81/t80.g81data.gguf",
+     "sha256": "b61a50caa0fb0864989824efb52594de793945dd9a04f7f19a01769407692f44",
+     "store_name": "t80.g81data.gguf"
+    },
+    {
+     "path": "models/g81/t80.g81data.json",
+     "sha256": "3c1af1728f4cbc30fce26493ecee31ff190704ef423296e5acfbc9aab795f222",
+     "store_name": "t80.g81data.json"
+    },
+    {
+     "path": "models/g81/t80.g81data.safetensors",
+     "sha256": "e0d45aa07ba386c8bf84eb2d7d7930e47a7013d2458b2fcb9118a1310256886a",
+     "store_name": "t80.g81data.safetensors"
+    },
+    {
+     "path": "models/g81/t80.g81data2.gguf",
+     "sha256": "f0fdadcfedcad8a6867d43340fc8e622413dcf1943817612e30369854a313df0",
+     "store_name": "t80.g81data2.gguf"
+    },
+    {
+     "path": "models/g81/t80.g81data2.json",
+     "sha256": "57ebc5a0273c18e14f1c3d8fdcc33ec4af663f9fc5b81688251a96ade0650304",
+     "store_name": "t80.g81data2.json"
+    },
+    {
+     "path": "models/g81/t80.g81data2.safetensors",
+     "sha256": "dab978605cbacfbf402ae7045d7362a606e6b2d37385cfe2c0a7e32d2f5f330d",
+     "store_name": "t80.g81data2.safetensors"
+    },
+    {
+     "path": "models/g81/t80.g81sources.gguf",
+     "sha256": "2f580c35151d7bcaa69295c8779fca1a7d69612fac56f6d6350a4735945d4f4c",
+     "store_name": "t80.g81sources.gguf"
+    },
+    {
+     "path": "models/g81/t80.g81sources.json",
+     "sha256": "d8f9d8be630370f427ac7d6c5bd26f96ffabbc0c6e60850983346f82e2591fb3",
+     "store_name": "t80.g81sources.json"
+    }
+   ]
+  },
+  "03-released-cells-and-rows-09.tar.zst": {
+   "bytes": 223931629,
+   "sha256": "1af0a807765b385a28851aabaefff6d2c2445fddccccdbe5d9ca883a640dc8b4",
+   "parts": 3,
+   "files": [
+    {
+     "path": "models/g81/t80.g81sources.safetensors",
+     "sha256": "7e9c338acf013af5636a3f177e9075467182e4a76ce21cb11a6b36cba1a828d9",
+     "store_name": "t80.g81sources.safetensors"
+    },
+    {
+     "path": "models/g81/t80.g81sources2.gguf",
+     "sha256": "427bef5902a376b123e40893847053c7c268cc260415e9ea55e7adcd1bb7d8d0",
+     "store_name": "t80.g81sources2.gguf"
+    },
+    {
+     "path": "models/g81/t80.g81sources2.json",
+     "sha256": "c15699862c9d1b3bea321a37f7cc8c22a1015012ffe483575035d2fe87d9d472",
+     "store_name": "t80.g81sources2.json"
+    },
+    {
+     "path": "models/g81/t80.g81sources2.safetensors",
+     "sha256": "2b526c369c321c06ef23a68198c07801d38ba49300180e85780a40108c35e5fb",
+     "store_name": "t80.g81sources2.safetensors"
+    },
+    {
+     "path": "models/g81/t80.g81trunk.gguf",
+     "sha256": "ac8947263feb2b306ca0a3458aa15411223c00251944188e08c27e7c1e8a1175",
+     "store_name": "t80.g81trunk.gguf"
+    },
+    {
+     "path": "models/g81/t80.g81trunk.json",
+     "sha256": "2a5f7ad802aeae45512feba72ebbd8bd07ed0e6bb8997d77a019a8af9f867997",
+     "store_name": "t80.g81trunk.json"
+    }
+   ]
+  },
+  "03-released-cells-and-rows-10.tar.zst": {
+   "bytes": 255817162,
+   "sha256": "cc95893fb0be332c3d6ee9510de75abd3a911c0c4022a6dddbd533efa8e1d281",
+   "parts": 4,
+   "files": [
+    {
+     "path": "models/g81/t80.g81trunk.safetensors",
+     "sha256": "13069c3aba05d4d4cc319b36657b3e9d9c45840e54888588108978ed3cfd1f8c",
+     "store_name": "t80.g81trunk.safetensors"
+    },
+    {
+     "path": "models/g81/t80.g81words.gguf",
+     "sha256": "6aa18ea5dc23d562e5acf954532c5ec671c522e44783e05b3bb7dfb329d7a041",
+     "store_name": "t80.g81words.gguf"
+    },
+    {
+     "path": "models/g81/t80.g81words.json",
+     "sha256": "e564300b0aaa127b6b45041f876747a1da0252c24924b1a4d48f47bb94a82b2a",
+     "store_name": "t80.g81words.json"
+    },
+    {
+     "path": "models/g81/t80.g81words.safetensors",
+     "sha256": "8c18b1413d25291ef32536d75b43504c3a2ae0bccf1ddf73cb1976c74bc866af",
+     "store_name": "t80.g81words.safetensors"
+    },
+    {
+     "path": "models/g81/t80.g81words2.gguf",
+     "sha256": "4445a574b7c47c22ef1adb47c5f597f3b14088efa32ecd91c9ce086bd98f1dd7",
+     "store_name": "t80.g81words2.gguf"
+    },
+    {
+     "path": "models/g81/t80.g81words2.json",
+     "sha256": "2c796c89d65e9b0cdb1f9225b2a49e0fb0f592942d5a7e9c2b107848ec2101bb",
+     "store_name": "t80.g81words2.json"
+    }
+   ]
+  },
+  "03-released-cells-and-rows-11.tar.zst": {
+   "bytes": 224099109,
+   "sha256": "d30db9dc7787eea0040ea9e0947a7ec83c43534969d3fc40272fd1b14ffc121b",
+   "parts": 3,
+   "files": [
+    {
+     "path": "datasets/g80/rows.jsonl",
+     "sha256": "2768bfa87bd0a4b2bf8753e9345b3849eb3ab27fb5bd720482e664b14e3def5e",
+     "store_name": "rows.jsonl"
+    },
+    {
+     "path": "models/g73/t80.g73code.json",
+     "sha256": "8235669b8e8996e815cfd1b7ae70bd7e22b4985a8c3792942f05cde50d4f1d44",
+     "store_name": "t80.g73code.json"
+    },
+    {
+     "path": "models/g73/t80.g73code.safetensors",
+     "sha256": "98eca6a87b10398300c815878fe81aece3feb8bfce13fbe322a31379ed01c15f",
+     "store_name": "t80.g73code.safetensors"
+    },
+    {
+     "path": "models/g73/t80.g73data.safetensors",
+     "sha256": "500f77bfc9fddda2076acef07677e0700871eb34eaf10dfec86ee1bf6fd9efa1",
+     "store_name": "t80.g73data.safetensors"
+    },
+    {
+     "path": "models/g81/t80.g81words2.safetensors",
+     "sha256": "1fae66c88a09b69efaa6c1f2184384aa70ffbf635531cd6bf42ffed17f87eddd",
+     "store_name": "t80.g81words2.safetensors"
+    }
+   ]
+  },
+  "05-installed-cells-before-g60-02.tar.zst": {
+   "bytes": 264050524,
+   "sha256": "a39a26b5d860aa85bf62006009334f9cba54441bb77d1ebfe525a5fe8f52d8fc",
+   "parts": 4,
+   "files": [
+    {
+     "path": "models/g39/t80+g39code.gguf",
+     "sha256": "3201b9fdcc05ec357b5a33294cd4a57bd9d801a6229d40945a57a68a150fd96f",
+     "store_name": "t80.g39code.gguf"
+    }
+   ]
+  },
+  "05-installed-cells-before-g60-07.tar.zst": {
+   "bytes": 262975536,
+   "sha256": "a4e990ed495cd34b1870c45580d5807a50a823c0fe3ebcb868c41e462e7eda4e",
+   "parts": 4,
+   "files": [
+    {
+     "path": "models/g44/t80+g44words2.gguf",
+     "sha256": "7d078b5637f9272107decee8c84039a4df1a36fa4e4caf661aa7d90fc4ad2c61",
+     "store_name": "t80.g44words2.gguf"
+    }
+   ]
+  }
+ }
+}
