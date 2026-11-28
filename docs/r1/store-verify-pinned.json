@@ -1,0 +1,360 @@
+{
+ "repo": "asrinna118/hivemind-cells",
+ "revision": "71f3b5baad9042e785bca254e0190cbebb7de60f",
+ "verdict": "ALL PROVEN",
+ "counts": {
+  "PROVEN": 86,
+  "HF_OWN": 1
+ },
+ "download_all": true,
+ "files": {
+  "g39/t80.g39code.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g44/t80.g44words2.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73code.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73code.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73code.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73code2.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73code2.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73code2.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73data.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73data.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73data.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73data2.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73data2.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73data2.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73sources.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73sources.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73sources.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73sources2.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73sources2.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73sources2.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73trunk.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73trunk.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73trunk.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73words.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73words.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73words.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73words2.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73words2.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g73/t80.g73words2.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80code.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80code.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80code.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80code2.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80code2.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80code2.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80data.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80data.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80data.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80data2.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80data2.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80data2.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80sources.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80sources.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80sources.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80sources2.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80sources2.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80sources2.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80trunk.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80trunk.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80trunk.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80words.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80words.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80words.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80words2.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80words2.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g80/t80.g80words2.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81code.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81code.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81code.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81code2.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81code2.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81code2.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81data.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81data.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81data.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81data2.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81data2.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81data2.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81sources.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81sources.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81sources.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81sources2.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81sources2.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81sources2.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81trunk.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81trunk.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81trunk.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81words.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81words.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81words.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81words2.gguf": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81words2.json": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g81/t80.g81words2.safetensors": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "shared/rows.jsonl": {
+   "status": "PROVEN",
+   "detail": "downloaded, SHA-256 = extract-time SHA-256"
+  },
+  "g39/t80.g39code.safetensors": {
+   "status": "PROVEN",
+   "detail": "rebuilt from the proven .gguf: identical bytes"
+  },
+  "g44/t80.g44words2.safetensors": {
+   "status": "PROVEN",
+   "detail": "rebuilt from the proven .gguf: identical bytes"
+  },
+  ".gitattributes": {
+   "status": "HF_OWN",
+   "detail": "Hugging Face's own file"
+  }
+ }
+}

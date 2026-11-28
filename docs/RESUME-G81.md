@@ -267,7 +267,20 @@ easy slice:
      "sha256": "1f35cedfc6c665778cf769869c29bcd44c2f6caa836ea37a57c22a0994efe8c6",
      "copy": "docs/r1/store-verify.json"
     },
-    "run_output": "Store-verify-results-20261128-0532/store-verify-run-output.txt"
+    "run_output": "Store-verify-results-20261128-0532/store-verify-run-output.txt",
+    "revision": "71f3b5baad9042e785bca254e0190cbebb7de60f",
+    "pinned_rerun": {
+     "run": "scripts/verify_store.py --repo asrinna118/hivemind-cells --download-all, from main at 43353ce (the fixed script: one store revision resolved at the start, used for the listing and every download, recorded in the result), Colab, 2026-11-28",
+     "result": "ALL PROVEN: 86 of 86 PROVEN (84 downloaded and hashed, 2 rebuilt with identical bytes) + 1 HF_OWN, exit 0",
+     "revision": "71f3b5baad9042e785bca254e0190cbebb7de60f",
+     "result_file": {
+      "path": "HiveMIND recovery \u2014 2026-11-26/Store-verify-results-FIXED-20261128-0701/store-verify.json (Google Drive)",
+      "bytes": 10430,
+      "sha256": "91a9a3401c47143f7b369112ae10d13ba7fd965e6754414f61de462e2b6cef6a",
+      "copy": "docs/r1/store-verify-pinned.json"
+     },
+     "note": "the first 86/86 run (result_file above, 1f35cedf...) used the earlier unpinned script and recorded no revision; this run confirms the same 86/86 at a single pinned revision"
+    }
    },
    "superseded": {
     "proven_by_hash": 51,
@@ -415,6 +428,14 @@ copied to `docs/r1/`.
   - **Result file:** `store-verify.json` (10,373 B, SHA-256 `1f35cedf…efe8c6`), in the Drive recovery folder under
     `Store-verify-results-20261128-0532/`, with `store-verify-run-output.txt`. A copy is at
     `docs/r1/store-verify.json`.
+  - **Re-run at a pinned revision (2026-11-28): ALL PROVEN again, 86 of 86, at store revision
+    `71f3b5baad9042e785bca254e0190cbebb7de60f`.** It used the fixed `verify_store.py` from `main` at `43353ce`, which
+    resolves one revision at the start and uses it for the listing and every download.
+    - Result file: `store-verify.json` (10,430 B, SHA-256 `91a9a340…6cef6a`) in
+      `Store-verify-results-FIXED-20261128-0701/` in the Drive recovery folder, copied as
+      `docs/r1/store-verify-pinned.json`.
+    - The first 86/86 run used the earlier, unpinned script and recorded no revision. This run confirms it at one
+      revision.
   - The earlier figure, 51 of 86, came from a hand-copied listing (`docs/r1/store-listing-check.tsv`) and is
     superseded.
 - **Fixes from the independent audit (2026-11-28)**, which confirmed the 14 keys and the 86/86 result:

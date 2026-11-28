@@ -57,7 +57,20 @@
      "sha256": "1f35cedfc6c665778cf769869c29bcd44c2f6caa836ea37a57c22a0994efe8c6",
      "copy": "docs/r1/store-verify.json"
     },
-    "run_output": "Store-verify-results-20261128-0532/store-verify-run-output.txt"
+    "run_output": "Store-verify-results-20261128-0532/store-verify-run-output.txt",
+    "revision": "71f3b5baad9042e785bca254e0190cbebb7de60f",
+    "pinned_rerun": {
+     "run": "scripts/verify_store.py --repo asrinna118/hivemind-cells --download-all, from main at 43353ce (the fixed script: one store revision resolved at the start, used for the listing and every download, recorded in the result), Colab, 2026-11-28",
+     "result": "ALL PROVEN: 86 of 86 PROVEN (84 downloaded and hashed, 2 rebuilt with identical bytes) + 1 HF_OWN, exit 0",
+     "revision": "71f3b5baad9042e785bca254e0190cbebb7de60f",
+     "result_file": {
+      "path": "HiveMIND recovery \u2014 2026-11-26/Store-verify-results-FIXED-20261128-0701/store-verify.json (Google Drive)",
+      "bytes": 10430,
+      "sha256": "91a9a3401c47143f7b369112ae10d13ba7fd965e6754414f61de462e2b6cef6a",
+      "copy": "docs/r1/store-verify-pinned.json"
+     },
+     "note": "the first 86/86 run (result_file above, 1f35cedf...) used the earlier unpinned script and recorded no revision; this run confirms the same 86/86 at a single pinned revision"
+    }
    },
    "superseded": {
     "proven_by_hash": 51,
